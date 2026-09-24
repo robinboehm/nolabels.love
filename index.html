@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Relationship Anarchy Smörgåsbord — Board</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-row">
+    <h1 class="app-title">RA Smörgåsbord</h1>
+
+    <div class="person-controls">
+      <label for="person-select" class="sr-only">Person</label>
+      <select id="person-select"></select>
+      <button id="btn-add-person" class="btn btn-icon" title="Person hinzufügen">＋</button>
+      <button id="btn-rename-person" class="btn btn-icon" title="Person umbenennen">✎</button>
+      <button id="btn-delete-person" class="btn btn-icon" title="Person löschen">🗑</button>
+    </div>
+
+    <div class="data-controls">
+      <button id="btn-export" class="btn">Export</button>
+      <button id="btn-import" class="btn">Import</button>
+      <input type="file" id="file-import" accept="application/json" class="sr-only" />
+    </div>
+  </div>
+
+  <div class="topbar-row">
+    <nav class="tabs" role="tablist" aria-label="Ansicht">
+      <button class="tab active" data-view="board" role="tab" aria-selected="true">Board</button>
+      <button class="tab" data-view="overview" role="tab" aria-selected="false">Übersicht</button>
+    </nav>
+
+    <div class="legend">
+      <span class="legend-item"><span class="swatch swatch--fulfilled"></span> erfüllt</span>
+      <span class="legend-item"><span class="swatch swatch--partial"></span> teilweise</span>
+      <span class="legend-item"><span class="swatch swatch--unfulfilled"></span> nicht erfüllt</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="view-board" class="view">
+    <p class="hint">
+      Klicke auf eine Kategorie, um die Elemente zu bewerten. Die Kategorien
+      sind lose sortiert: außen eher gesellschaftlich/strukturell, innen eher
+      persönlich/intim — ganz wie im Original-Smörgåsbord.
+    </p>
+    <div class="board-wrap" id="board-wrap">
+      <div id="board-rings"></div>
+      <div class="hub" id="hub">
+        <div class="hub-inner" id="hub-inner"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-overview" class="view hidden">
+    <div id="overview-total" class="overview-total"></div>
+    <div id="overview-list" class="overview-list"></div>
+  </section>
+</main>
+
+<div class="panel-backdrop" id="panel-backdrop"></div>
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="panel-close" id="panel-close" aria-label="Schließen">✕</button>
+  <h2 id="panel-title"></h2>
+  <div id="panel-items"></div>
+</aside>
+
+<footer class="app-footer">
+  <p>
+    Inhalte basieren auf dem
+    <strong>Relationship Anarchy Smörgåsbord (v6)</strong> von Lyrica Lawrence
+    &amp; Heather Orr, aktualisiert von Maxx Hill — lizenziert unter
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>.
+    Diese App speichert alle Daten ausschließlich lokal in deinem Browser
+    (localStorage) — nichts wird an einen Server gesendet.
+  </p>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
