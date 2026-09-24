@@ -1,10 +1,20 @@
 # Relationship Anarchy Smörgåsbord — interaktives Board
 
 Eine kleine, rein clientseitige Web-App, um pro Beziehungsperson zu erfassen,
-welche Elemente des [Relationship Anarchy Smörgåsbord](https://www.google.com/search?q=relationship+anarchy+smörgåsbord)
-(v6, Lyrica Lawrence & Heather Orr, aktualisiert von Maxx Hill) ihr **erfüllt**,
-**teilweise erfüllt**, **nicht erfüllt** oder **bisher unbeantwortet** (noch
-nicht besprochen) seht — inklusive optionaler Notizen pro Punkt.
+wie es um die Elemente des [Relationship Anarchy Smörgåsbord](https://www.google.com/search?q=relationship+anarchy+smörgåsbord)
+(v6, Lyrica Lawrence & Heather Orr, aktualisiert von Maxx Hill) steht —
+inklusive optionaler Notizen pro Punkt.
+
+Pro Element werden zwei unabhängige Dimensionen erfasst:
+
+- **Status**: erfüllt / teilweise erfüllt / nicht erfüllt / bisher unbeantwortet
+- **Wunsch**: gewünscht / nicht gewünscht / bisher unbeantwortet
+
+Das trennt bewusst "ist es (nicht) so?" von "will ich das (nicht)?" — ein
+Punkt kann z. B. bewusst nicht gewünscht und gleichzeitig nicht erfüllt sein,
+und das ist dann völlig in Ordnung. Passen Status und Wunsch nicht zusammen
+(z. B. gewünscht, aber nicht erfüllt), markiert die App das Element mit ⚠
+als Diskrepanz, die sich zu besprechen lohnt.
 
 ## Nutzung
 

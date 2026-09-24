@@ -26,6 +26,23 @@ const STATUS_LABELS = {
 // decision.
 const DEFAULT_STATUS = STATUS.UNANSWERED;
 
+// Second, independent dimension: whether an item is something you actually
+// want, separate from whether it currently happens. E.g. "nicht gewünscht"
+// + "nicht erfüllt" is a good match, not a gap.
+const DESIRE = {
+  UNANSWERED: 'unanswered',
+  WANTED: 'wanted',
+  UNWANTED: 'unwanted',
+};
+
+const DESIRE_LABELS = {
+  [DESIRE.UNANSWERED]: 'unbeantwortet',
+  [DESIRE.WANTED]: 'gewünscht',
+  [DESIRE.UNWANTED]: 'nicht gewünscht',
+};
+
+const DEFAULT_DESIRE = DESIRE.UNANSWERED;
+
 let state = loadState();
 let currentPanelCategoryId = null;
 
@@ -73,22 +90,41 @@ function getSelectedPerson() {
   return state.people.find((p) => p.id === state.selectedPersonId) || state.people[0];
 }
 
+// Merges in defaults so entries from before the "desire" dimension existed
+// (or with no entry at all) always come back fully populated.
 function getItemEntry(person, itemId) {
-  return person.items[itemId] || { status: DEFAULT_STATUS, note: '' };
+  return { status: DEFAULT_STATUS, desire: DEFAULT_DESIRE, note: '', ...person.items[itemId] };
+}
+
+function updateItemEntry(person, itemId, changes) {
+  const entry = { ...getItemEntry(person, itemId), ...changes };
+  person.items[itemId] = entry;
+  saveState();
+  return entry;
 }
 
 function setItemStatus(person, itemId, status) {
-  const entry = person.items[itemId] || { status: DEFAULT_STATUS, note: '' };
-  entry.status = status;
-  person.items[itemId] = entry;
-  saveState();
+  return updateItemEntry(person, itemId, { status });
+}
+
+function setItemDesire(person, itemId, desire) {
+  return updateItemEntry(person, itemId, { desire });
 }
 
 function setItemNote(person, itemId, note) {
-  const entry = person.items[itemId] || { status: DEFAULT_STATUS, note: '' };
-  entry.note = note;
-  person.items[itemId] = entry;
-  saveState();
+  return updateItemEntry(person, itemId, { note });
+}
+
+// Whether the current status lines up with what's actually wanted.
+// Returns null when there isn't enough information yet (desire or status
+// still unanswered) or the status is "teilweise" (deliberately not judged
+// as a clean match or mismatch).
+function computeMatch(entry) {
+  if (entry.desire === DESIRE.UNANSWERED || entry.status === STATUS.UNANSWERED) return null;
+  if (entry.status === STATUS.PARTIAL) return null;
+  const isFulfilled = entry.status === STATUS.FULFILLED;
+  const isWanted = entry.desire === DESIRE.WANTED;
+  return isFulfilled === isWanted ? 'match' : 'mismatch';
 }
 
 // ---------------------------------------------------------------------
@@ -99,6 +135,7 @@ function computeCategoryStats(person, category) {
   let fulfilled = 0;
   let partial = 0;
   let unfulfilled = 0;
+  let mismatches = 0;
   category.items.forEach((item) => {
     const entry = person.items[item.id];
     if (!entry) return; // no entry yet -> counts as unanswered
@@ -106,10 +143,11 @@ function computeCategoryStats(person, category) {
     else if (entry.status === STATUS.PARTIAL) partial++;
     else if (entry.status === STATUS.UNFULFILLED) unfulfilled++;
     // STATUS.UNANSWERED falls through and is covered by the remainder below
+    if (computeMatch(getItemEntry(person, item.id)) === 'mismatch') mismatches++;
   });
   const total = category.items.length;
   const unanswered = total - fulfilled - partial - unfulfilled;
-  return { total, fulfilled, partial, unfulfilled, unanswered };
+  return { total, fulfilled, partial, unfulfilled, unanswered, mismatches };
 }
 
 function computeOverallStats(person) {
@@ -118,6 +156,7 @@ function computeOverallStats(person) {
   let partial = 0;
   let unfulfilled = 0;
   let unanswered = 0;
+  let mismatches = 0;
   RA_CATEGORIES.forEach((category) => {
     const stats = computeCategoryStats(person, category);
     total += stats.total;
@@ -125,8 +164,9 @@ function computeOverallStats(person) {
     partial += stats.partial;
     unfulfilled += stats.unfulfilled;
     unanswered += stats.unanswered;
+    mismatches += stats.mismatches;
   });
-  return { total, fulfilled, partial, unfulfilled, unanswered };
+  return { total, fulfilled, partial, unfulfilled, unanswered, mismatches };
 }
 
 function conicGradientFor(stats) {
@@ -197,7 +237,9 @@ function createBubbleElement(category, x, y, ringClass, person) {
   btn.dataset.categoryId = category.id;
   btn.setAttribute(
     'aria-label',
-    `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise, ${stats.unanswered} unbeantwortet`
+    `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise, ` +
+      `${stats.unanswered} unbeantwortet` +
+      (stats.mismatches > 0 ? `, ${stats.mismatches} Diskrepanz(en) zwischen Wunsch und Status` : '')
   );
   btn.innerHTML = `
     <span class="bubble-label">${escapeHtml(category.title)}</span>
@@ -206,7 +248,10 @@ function createBubbleElement(category, x, y, ringClass, person) {
       <span class="progress-partial" style="width:${pPct}%"></span>
       <span class="progress-unfulfilled" style="width:${uPct}%"></span>
     </span>
-    <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
+    <span class="bubble-badge-row">
+      <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
+      ${stats.mismatches > 0 ? `<span class="mismatch-flag" title="${stats.mismatches} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${stats.mismatches}</span>` : ''}
+    </span>
   `;
   btn.addEventListener('click', () => openCategoryPanel(category.id));
   return btn;
@@ -260,6 +305,9 @@ function renderOverview() {
     <div>vollständig erfüllt für <strong>${escapeHtml(person.name)}</strong>
       (${overall.fulfilled}/${overall.total}, +${overall.partial} teilweise,
       ${overall.unanswered} unbeantwortet)</div>
+    ${overall.mismatches > 0
+      ? `<div class="mismatch-summary">⚠ ${overall.mismatches} Diskrepanz(en) zwischen Wunsch und Status — lohnt sich zu besprechen</div>`
+      : ''}
   `;
 
   listEl.innerHTML = '';
@@ -274,7 +322,10 @@ function renderOverview() {
     row.innerHTML = `
       <div class="overview-row-head">
         <span class="cat-title">${escapeHtml(category.title)}</span>
-        <span class="cat-count">${stats.fulfilled}/${stats.total}</span>
+        <span class="cat-count">
+          ${stats.fulfilled}/${stats.total}
+          ${stats.mismatches > 0 ? `<span class="mismatch-flag" title="${stats.mismatches} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${stats.mismatches}</span>` : ''}
+        </span>
       </div>
       <div class="progress-bar">
         <span class="progress-fulfilled" style="width:${fPct}%"></span>
@@ -309,25 +360,68 @@ function openCategoryPanel(categoryId) {
     const row = document.createElement('div');
     row.className = 'item-row';
     row.innerHTML = `
-      <div class="item-row-main">
+      <div class="item-row-head">
         <span class="item-label">${escapeHtml(item.label)}</span>
+        <span class="match-indicator" aria-hidden="true"></span>
+      </div>
+      <div class="item-row-control">
+        <span class="control-label">Status</span>
         <div class="status-group" role="group" aria-label="Status für ${escapeHtml(item.label)}">
           <button type="button" class="status-btn status-btn--unanswered" data-status="${STATUS.UNANSWERED}">unbeantwortet</button>
           <button type="button" class="status-btn status-btn--unfulfilled" data-status="${STATUS.UNFULFILLED}">nicht erfüllt</button>
           <button type="button" class="status-btn status-btn--partial" data-status="${STATUS.PARTIAL}">teilweise</button>
           <button type="button" class="status-btn status-btn--fulfilled" data-status="${STATUS.FULFILLED}">erfüllt</button>
         </div>
+      </div>
+      <div class="item-row-control">
+        <span class="control-label">Wunsch</span>
+        <div class="desire-group" role="group" aria-label="Wunsch für ${escapeHtml(item.label)}">
+          <button type="button" class="desire-btn desire-btn--unanswered" data-desire="${DESIRE.UNANSWERED}">unbeantwortet</button>
+          <button type="button" class="desire-btn desire-btn--unwanted" data-desire="${DESIRE.UNWANTED}">nicht gewünscht</button>
+          <button type="button" class="desire-btn desire-btn--wanted" data-desire="${DESIRE.WANTED}">gewünscht</button>
+        </div>
         <button type="button" class="note-toggle" aria-label="Notiz für ${escapeHtml(item.label)}">📝</button>
       </div>
       <textarea class="item-note hidden" placeholder="Notiz (optional)"></textarea>
     `;
 
+    const matchIndicator = row.querySelector('.match-indicator');
+
+    function refreshMatchIndicator(currentEntry) {
+      const match = computeMatch(currentEntry);
+      matchIndicator.className = 'match-indicator';
+      if (match === 'match') {
+        matchIndicator.classList.add('match-indicator--match');
+        matchIndicator.textContent = '✓';
+        matchIndicator.title = 'Passt zusammen: Wunsch und Status stimmen überein';
+      } else if (match === 'mismatch') {
+        matchIndicator.classList.add('match-indicator--mismatch');
+        matchIndicator.textContent = '⚠';
+        matchIndicator.title = 'Diskrepanz: Wunsch und Status stimmen nicht überein — vielleicht ansprechen?';
+      } else {
+        matchIndicator.textContent = '';
+        matchIndicator.title = '';
+      }
+    }
+
     const statusButtons = row.querySelectorAll('.status-btn');
     statusButtons.forEach((btn) => {
       if (btn.dataset.status === entry.status) btn.classList.add('active');
       btn.addEventListener('click', () => {
-        setItemStatus(person, item.id, btn.dataset.status);
+        const updated = setItemStatus(person, item.id, btn.dataset.status);
         statusButtons.forEach((b) => b.classList.toggle('active', b === btn));
+        refreshMatchIndicator(updated);
+        refreshBackgroundViews();
+      });
+    });
+
+    const desireButtons = row.querySelectorAll('.desire-btn');
+    desireButtons.forEach((btn) => {
+      if (btn.dataset.desire === entry.desire) btn.classList.add('active');
+      btn.addEventListener('click', () => {
+        const updated = setItemDesire(person, item.id, btn.dataset.desire);
+        desireButtons.forEach((b) => b.classList.toggle('active', b === btn));
+        refreshMatchIndicator(updated);
         refreshBackgroundViews();
       });
     });
@@ -348,6 +442,7 @@ function openCategoryPanel(categoryId) {
       refreshBackgroundViews();
     });
 
+    refreshMatchIndicator(entry);
     itemsEl.appendChild(row);
   });
 
