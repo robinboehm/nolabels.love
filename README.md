@@ -3,8 +3,8 @@
 Eine kleine, rein clientseitige Web-App, um pro Beziehungsperson zu erfassen,
 welche Elemente des [Relationship Anarchy Smörgåsbord](https://www.google.com/search?q=relationship+anarchy+smörgåsbord)
 (v6, Lyrica Lawrence & Heather Orr, aktualisiert von Maxx Hill) ihr **erfüllt**,
-**teilweise erfüllt** oder **nicht erfüllt** seht — inklusive optionaler Notizen
-pro Punkt.
+**teilweise erfüllt**, **nicht erfüllt** oder **bisher unbeantwortet** (noch
+nicht besprochen) seht — inklusive optionaler Notizen pro Punkt.
 
 ## Nutzung
 

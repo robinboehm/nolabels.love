@@ -8,16 +8,23 @@
 const STORAGE_KEY = 'ra-smorgasbord-data-v1';
 
 const STATUS = {
+  UNANSWERED: 'unanswered',
   UNFULFILLED: 'unfulfilled',
   PARTIAL: 'partial',
   FULFILLED: 'fulfilled',
 };
 
 const STATUS_LABELS = {
+  [STATUS.UNANSWERED]: 'unbeantwortet',
   [STATUS.UNFULFILLED]: 'nicht erfüllt',
   [STATUS.PARTIAL]: 'teilweise',
   [STATUS.FULFILLED]: 'erfüllt',
 };
+
+// Items without an explicit entry (or with this status) count as "not yet
+// discussed" rather than being lumped in with an active "nicht erfüllt"
+// decision.
+const DEFAULT_STATUS = STATUS.UNANSWERED;
 
 let state = loadState();
 let currentPanelCategoryId = null;
@@ -67,18 +74,18 @@ function getSelectedPerson() {
 }
 
 function getItemEntry(person, itemId) {
-  return person.items[itemId] || { status: STATUS.UNFULFILLED, note: '' };
+  return person.items[itemId] || { status: DEFAULT_STATUS, note: '' };
 }
 
 function setItemStatus(person, itemId, status) {
-  const entry = person.items[itemId] || { status: STATUS.UNFULFILLED, note: '' };
+  const entry = person.items[itemId] || { status: DEFAULT_STATUS, note: '' };
   entry.status = status;
   person.items[itemId] = entry;
   saveState();
 }
 
 function setItemNote(person, itemId, note) {
-  const entry = person.items[itemId] || { status: STATUS.UNFULFILLED, note: '' };
+  const entry = person.items[itemId] || { status: DEFAULT_STATUS, note: '' };
   entry.note = note;
   person.items[itemId] = entry;
   saveState();
@@ -91,34 +98,43 @@ function setItemNote(person, itemId, note) {
 function computeCategoryStats(person, category) {
   let fulfilled = 0;
   let partial = 0;
+  let unfulfilled = 0;
   category.items.forEach((item) => {
     const entry = person.items[item.id];
-    if (!entry) return;
+    if (!entry) return; // no entry yet -> counts as unanswered
     if (entry.status === STATUS.FULFILLED) fulfilled++;
     else if (entry.status === STATUS.PARTIAL) partial++;
+    else if (entry.status === STATUS.UNFULFILLED) unfulfilled++;
+    // STATUS.UNANSWERED falls through and is covered by the remainder below
   });
   const total = category.items.length;
-  return { total, fulfilled, partial, unfulfilled: total - fulfilled - partial };
+  const unanswered = total - fulfilled - partial - unfulfilled;
+  return { total, fulfilled, partial, unfulfilled, unanswered };
 }
 
 function computeOverallStats(person) {
   let total = 0;
   let fulfilled = 0;
   let partial = 0;
+  let unfulfilled = 0;
+  let unanswered = 0;
   RA_CATEGORIES.forEach((category) => {
     const stats = computeCategoryStats(person, category);
     total += stats.total;
     fulfilled += stats.fulfilled;
     partial += stats.partial;
+    unfulfilled += stats.unfulfilled;
+    unanswered += stats.unanswered;
   });
-  return { total, fulfilled, partial, unfulfilled: total - fulfilled - partial };
+  return { total, fulfilled, partial, unfulfilled, unanswered };
 }
 
 function conicGradientFor(stats) {
-  if (stats.total === 0) return 'var(--color-unfulfilled)';
+  if (stats.total === 0) return 'var(--color-unanswered)';
   const fEnd = (stats.fulfilled / stats.total) * 100;
   const pEnd = fEnd + (stats.partial / stats.total) * 100;
-  return `conic-gradient(var(--color-fulfilled) 0% ${fEnd}%, var(--color-partial) ${fEnd}% ${pEnd}%, var(--color-unfulfilled) ${pEnd}% 100%)`;
+  const uEnd = pEnd + (stats.unfulfilled / stats.total) * 100;
+  return `conic-gradient(var(--color-fulfilled) 0% ${fEnd}%, var(--color-partial) ${fEnd}% ${pEnd}%, var(--color-unfulfilled) ${pEnd}% ${uEnd}%, var(--color-unanswered) ${uEnd}% 100%)`;
 }
 
 function escapeHtml(str) {
@@ -171,6 +187,7 @@ function createBubbleElement(category, x, y, ringClass, person) {
   const stats = computeCategoryStats(person, category);
   const fPct = stats.total === 0 ? 0 : (stats.fulfilled / stats.total) * 100;
   const pPct = stats.total === 0 ? 0 : (stats.partial / stats.total) * 100;
+  const uPct = stats.total === 0 ? 0 : (stats.unfulfilled / stats.total) * 100;
 
   const btn = document.createElement('button');
   btn.type = 'button';
@@ -180,13 +197,14 @@ function createBubbleElement(category, x, y, ringClass, person) {
   btn.dataset.categoryId = category.id;
   btn.setAttribute(
     'aria-label',
-    `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise`
+    `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise, ${stats.unanswered} unbeantwortet`
   );
   btn.innerHTML = `
     <span class="bubble-label">${escapeHtml(category.title)}</span>
     <span class="bubble-progress">
       <span class="progress-fulfilled" style="width:${fPct}%"></span>
       <span class="progress-partial" style="width:${pPct}%"></span>
+      <span class="progress-unfulfilled" style="width:${uPct}%"></span>
     </span>
     <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
   `;
@@ -239,7 +257,9 @@ function renderOverview() {
   const overallPercent = overall.total === 0 ? 0 : Math.round((overall.fulfilled / overall.total) * 100);
   totalEl.innerHTML = `
     <div class="big-percent">${overallPercent}%</div>
-    <div>vollständig erfüllt für <strong>${escapeHtml(person.name)}</strong> (${overall.fulfilled}/${overall.total}, +${overall.partial} teilweise)</div>
+    <div>vollständig erfüllt für <strong>${escapeHtml(person.name)}</strong>
+      (${overall.fulfilled}/${overall.total}, +${overall.partial} teilweise,
+      ${overall.unanswered} unbeantwortet)</div>
   `;
 
   listEl.innerHTML = '';
@@ -247,6 +267,7 @@ function renderOverview() {
     const stats = computeCategoryStats(person, category);
     const fPct = stats.total === 0 ? 0 : (stats.fulfilled / stats.total) * 100;
     const pPct = stats.total === 0 ? 0 : (stats.partial / stats.total) * 100;
+    const uPct = stats.total === 0 ? 0 : (stats.unfulfilled / stats.total) * 100;
 
     const row = document.createElement('div');
     row.className = 'overview-row';
@@ -258,6 +279,7 @@ function renderOverview() {
       <div class="progress-bar">
         <span class="progress-fulfilled" style="width:${fPct}%"></span>
         <span class="progress-partial" style="width:${pPct}%"></span>
+        <span class="progress-unfulfilled" style="width:${uPct}%"></span>
       </div>
     `;
     row.addEventListener('click', () => {
@@ -290,6 +312,7 @@ function openCategoryPanel(categoryId) {
       <div class="item-row-main">
         <span class="item-label">${escapeHtml(item.label)}</span>
         <div class="status-group" role="group" aria-label="Status für ${escapeHtml(item.label)}">
+          <button type="button" class="status-btn status-btn--unanswered" data-status="${STATUS.UNANSWERED}">unbeantwortet</button>
           <button type="button" class="status-btn status-btn--unfulfilled" data-status="${STATUS.UNFULFILLED}">nicht erfüllt</button>
           <button type="button" class="status-btn status-btn--partial" data-status="${STATUS.PARTIAL}">teilweise</button>
           <button type="button" class="status-btn status-btn--fulfilled" data-status="${STATUS.FULFILLED}">erfüllt</button>

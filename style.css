@@ -1,7 +1,8 @@
 :root {
   --color-fulfilled: #4caf7d;
   --color-partial: #e8b339;
-  --color-unfulfilled: #d9d6d1;
+  --color-unfulfilled: #c97b63;
+  --color-unanswered: #d9d6d1;
   --color-bg: #faf8f4;
   --color-ink: #2b2b2b;
   --color-muted: #6b6b6b;
@@ -129,6 +130,7 @@ select#person-select {
 .swatch--fulfilled { background: var(--color-fulfilled); }
 .swatch--partial { background: var(--color-partial); }
 .swatch--unfulfilled { background: var(--color-unfulfilled); }
+.swatch--unanswered { background: var(--color-unanswered); }
 
 /* ---------- Main / hint ---------- */
 
@@ -217,7 +219,7 @@ main {
   border-radius: 3px;
   overflow: hidden;
   display: flex;
-  background: var(--color-unfulfilled);
+  background: var(--color-unanswered);
 }
 
 .bubble-progress > span { height: 100%; display: block; }
@@ -360,12 +362,13 @@ main {
   border-radius: 6px;
   overflow: hidden;
   display: flex;
-  background: var(--color-unfulfilled);
+  background: var(--color-unanswered);
 }
 
 .progress-bar > span { height: 100%; display: block; }
 .progress-fulfilled { background: var(--color-fulfilled); }
 .progress-partial { background: var(--color-partial); }
+.progress-unfulfilled { background: var(--color-unfulfilled); }
 
 /* ---------- Side panel ---------- */
 
@@ -445,15 +448,17 @@ main {
 .status-btn {
   border: none;
   background: #fff;
-  padding: 0.3rem 0.55rem;
-  font-size: 0.7rem;
+  padding: 0.28rem 0.45rem;
+  font-size: 0.64rem;
+  white-space: nowrap;
   cursor: pointer;
   color: var(--color-muted);
 }
 
 .status-btn + .status-btn { border-left: 1px solid var(--color-border); }
 
-.status-btn--unfulfilled.active { background: var(--color-unfulfilled); color: var(--color-ink); }
+.status-btn--unanswered.active { background: var(--color-unanswered); color: var(--color-ink); }
+.status-btn--unfulfilled.active { background: var(--color-unfulfilled); color: #fff; }
 .status-btn--partial.active { background: var(--color-partial); color: #fff; }
 .status-btn--fulfilled.active { background: var(--color-fulfilled); color: #fff; }
 
