@@ -364,6 +364,9 @@ function openCategoryPanel(categoryId) {
         <span class="item-label">${escapeHtml(item.label)}</span>
         <span class="match-indicator" aria-hidden="true"></span>
       </div>
+      ${ITEM_TRANSLATIONS[item.id]
+        ? `<div class="item-translation">${escapeHtml(ITEM_TRANSLATIONS[item.id])}</div>`
+        : ''}
       <div class="item-row-control">
         <span class="control-label">Status</span>
         <div class="status-group" role="group" aria-label="Status für ${escapeHtml(item.label)}">

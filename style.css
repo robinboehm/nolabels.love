@@ -482,6 +482,13 @@ main {
 .match-indicator--match { color: var(--color-match); }
 .match-indicator--mismatch { color: var(--color-mismatch); }
 
+.item-translation {
+  font-size: 0.74rem;
+  color: var(--color-muted);
+  line-height: 1.35;
+  margin: -0.1rem 0 0.5rem;
+}
+
 .item-row-control {
   display: flex;
   align-items: center;
