@@ -16,6 +16,16 @@ und das ist dann völlig in Ordnung. Passen Status und Wunsch nicht zusammen
 (z. B. gewünscht, aber nicht erfüllt), markiert die App das Element mit ⚠
 als Diskrepanz, die sich zu besprechen lohnt.
 
+### Zwei Kennzahlen, zwei Farbskalen
+
+Die große Prozentzahl in der Mitte des Boards bzw. oben in der Übersicht
+zeigt nicht "wie viel ist erfüllt?", sondern **wie gut Wunsch und Status bei
+den bereits bewerteten Punkten übereinstimmen** ("Übereinstimmung") — mit
+eigener Farbskala (grün = passt zusammen, gelb = teilweise, orange =
+Diskrepanz, grau = noch nicht bewertet). Das reine "X% erfüllt" steht
+weiterhin klein daneben/darunter. Am Hub siehst du beide Ringe gleichzeitig:
+außen die Übereinstimmung, innen der plaine Status.
+
 ## Nutzung
 
 Kein Build, kein Server, keine Installation nötig:

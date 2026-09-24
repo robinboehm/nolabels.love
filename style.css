@@ -7,6 +7,10 @@
   --color-unwanted: #6f8fa8;
   --color-match: #4caf7d;
   --color-mismatch: #d98c3d;
+  --color-align-good: #4caf7d;
+  --color-align-partial: #e8b339;
+  --color-align-bad: #d98c3d;
+  --color-align-unrated: #d9d6d1;
   --color-bg: #faf8f4;
   --color-ink: #2b2b2b;
   --color-muted: #6b6b6b;
@@ -136,6 +140,20 @@ select#person-select {
 .swatch--unfulfilled { background: var(--color-unfulfilled); }
 .swatch--unanswered { background: var(--color-unanswered); }
 
+.swatch--align-good { background: var(--color-align-good); }
+.swatch--align-partial { background: var(--color-align-partial); }
+.swatch--align-bad { background: var(--color-align-bad); }
+.swatch--align-unrated { background: var(--color-align-unrated); }
+
+.legend--align {
+  padding-top: 0.1rem;
+}
+
+.legend-label {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
 /* ---------- Main / hint ---------- */
 
 main {
@@ -244,6 +262,9 @@ main {
 
 .bubble-progress > span { height: 100%; display: block; }
 
+/* Two nested rings: .hub (outer) shows the alignment score (the "second
+   color scale"), .hub-status-ring (middle) shows the plain status
+   distribution as before, .hub-inner (center) holds the text. */
 .hub {
   position: absolute;
   left: 50%;
@@ -252,8 +273,15 @@ main {
   width: clamp(120px, 21vw, 190px);
   height: clamp(120px, 21vw, 190px);
   border-radius: 50%;
-  padding: 10px;
+  padding: 7px;
   z-index: 1;
+}
+
+.hub-status-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  padding: 6px;
 }
 
 .hub-inner {
@@ -266,24 +294,33 @@ main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0.6rem;
+  padding: 0.5rem;
   box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .hub-name {
   font-weight: 700;
-  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
-  margin-bottom: 0.15rem;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  margin-bottom: 0.1rem;
 }
 
 .hub-percent {
-  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
   font-weight: 700;
+  line-height: 1.1;
 }
 
 .hub-sub {
-  font-size: 0.65rem;
+  font-size: clamp(0.56rem, 1vw, 0.62rem);
   color: var(--color-muted);
+  line-height: 1.25;
+}
+
+.hub-sub-secondary {
+  font-size: clamp(0.54rem, 0.9vw, 0.58rem);
+  color: var(--color-muted);
+  opacity: 0.8;
+  margin-top: 0.1rem;
 }
 
 /* On narrow screens there simply isn't enough circumference for 28
@@ -358,6 +395,16 @@ main {
 .overview-total .big-percent {
   font-size: 2.2rem;
   font-weight: 700;
+}
+
+.overview-total-label {
+  font-size: 0.9rem;
+}
+
+.overview-total-sub {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
 }
 
 .overview-list {

@@ -127,6 +127,10 @@ function computeMatch(entry) {
   return isFulfilled === isWanted ? 'match' : 'mismatch';
 }
 
+function getAllItems() {
+  return RA_CATEGORIES.flatMap((category) => category.items);
+}
+
 // ---------------------------------------------------------------------
 // Stats
 // ---------------------------------------------------------------------
@@ -135,7 +139,6 @@ function computeCategoryStats(person, category) {
   let fulfilled = 0;
   let partial = 0;
   let unfulfilled = 0;
-  let mismatches = 0;
   category.items.forEach((item) => {
     const entry = person.items[item.id];
     if (!entry) return; // no entry yet -> counts as unanswered
@@ -143,11 +146,10 @@ function computeCategoryStats(person, category) {
     else if (entry.status === STATUS.PARTIAL) partial++;
     else if (entry.status === STATUS.UNFULFILLED) unfulfilled++;
     // STATUS.UNANSWERED falls through and is covered by the remainder below
-    if (computeMatch(getItemEntry(person, item.id)) === 'mismatch') mismatches++;
   });
   const total = category.items.length;
   const unanswered = total - fulfilled - partial - unfulfilled;
-  return { total, fulfilled, partial, unfulfilled, unanswered, mismatches };
+  return { total, fulfilled, partial, unfulfilled, unanswered };
 }
 
 function computeOverallStats(person) {
@@ -156,7 +158,6 @@ function computeOverallStats(person) {
   let partial = 0;
   let unfulfilled = 0;
   let unanswered = 0;
-  let mismatches = 0;
   RA_CATEGORIES.forEach((category) => {
     const stats = computeCategoryStats(person, category);
     total += stats.total;
@@ -164,9 +165,32 @@ function computeOverallStats(person) {
     partial += stats.partial;
     unfulfilled += stats.unfulfilled;
     unanswered += stats.unanswered;
-    mismatches += stats.mismatches;
   });
-  return { total, fulfilled, partial, unfulfilled, unanswered, mismatches };
+  return { total, fulfilled, partial, unfulfilled, unanswered };
+}
+
+// How well status and desire line up, for a given list of items. This is
+// the "second dimension" score: it only rates items where both status and
+// desire are known (`rated`), since a plain average over the whole board
+// would stay near 0% for ages while things are still being filled in.
+// `percent` is null when nothing is rated yet.
+function computeAlignmentStats(person, items) {
+  let aligned = 0;
+  let partial = 0;
+  let misaligned = 0;
+  let unrated = 0;
+  items.forEach((item) => {
+    const entry = getItemEntry(person, item.id);
+    const match = computeMatch(entry);
+    if (match === 'match') aligned++;
+    else if (match === 'mismatch') misaligned++;
+    else if (entry.status === STATUS.PARTIAL && entry.desire !== DESIRE.UNANSWERED) partial++;
+    else unrated++;
+  });
+  const total = items.length;
+  const rated = aligned + partial + misaligned;
+  const percent = rated === 0 ? null : Math.round(((aligned * 100 + partial * 50) / rated));
+  return { total, rated, aligned, partial, misaligned, unrated, percent };
 }
 
 function conicGradientFor(stats) {
@@ -175,6 +199,14 @@ function conicGradientFor(stats) {
   const pEnd = fEnd + (stats.partial / stats.total) * 100;
   const uEnd = pEnd + (stats.unfulfilled / stats.total) * 100;
   return `conic-gradient(var(--color-fulfilled) 0% ${fEnd}%, var(--color-partial) ${fEnd}% ${pEnd}%, var(--color-unfulfilled) ${pEnd}% ${uEnd}%, var(--color-unanswered) ${uEnd}% 100%)`;
+}
+
+function alignmentGradientFor(stats) {
+  if (stats.total === 0) return 'var(--color-align-unrated)';
+  const aEnd = (stats.aligned / stats.total) * 100;
+  const pEnd = aEnd + (stats.partial / stats.total) * 100;
+  const mEnd = pEnd + (stats.misaligned / stats.total) * 100;
+  return `conic-gradient(var(--color-align-good) 0% ${aEnd}%, var(--color-align-partial) ${aEnd}% ${pEnd}%, var(--color-align-bad) ${pEnd}% ${mEnd}%, var(--color-align-unrated) ${mEnd}% 100%)`;
 }
 
 function escapeHtml(str) {
@@ -225,6 +257,7 @@ function layoutRing(categories, radii) {
 
 function createBubbleElement(category, x, y, ringClass, person) {
   const stats = computeCategoryStats(person, category);
+  const alignStats = computeAlignmentStats(person, category.items);
   const fPct = stats.total === 0 ? 0 : (stats.fulfilled / stats.total) * 100;
   const pPct = stats.total === 0 ? 0 : (stats.partial / stats.total) * 100;
   const uPct = stats.total === 0 ? 0 : (stats.unfulfilled / stats.total) * 100;
@@ -239,7 +272,7 @@ function createBubbleElement(category, x, y, ringClass, person) {
     'aria-label',
     `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise, ` +
       `${stats.unanswered} unbeantwortet` +
-      (stats.mismatches > 0 ? `, ${stats.mismatches} Diskrepanz(en) zwischen Wunsch und Status` : '')
+      (alignStats.misaligned > 0 ? `, ${alignStats.misaligned} Diskrepanz(en) zwischen Wunsch und Status` : '')
   );
   btn.innerHTML = `
     <span class="bubble-label">${escapeHtml(category.title)}</span>
@@ -250,7 +283,7 @@ function createBubbleElement(category, x, y, ringClass, person) {
     </span>
     <span class="bubble-badge-row">
       <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
-      ${stats.mismatches > 0 ? `<span class="mismatch-flag" title="${stats.mismatches} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${stats.mismatches}</span>` : ''}
+      ${alignStats.misaligned > 0 ? `<span class="mismatch-flag" title="${alignStats.misaligned} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${alignStats.misaligned}</span>` : ''}
     </span>
   `;
   btn.addEventListener('click', () => openCategoryPanel(category.id));
@@ -278,14 +311,24 @@ function renderBoard() {
 function renderHub() {
   const person = getSelectedPerson();
   const stats = computeOverallStats(person);
+  const alignStats = computeAlignmentStats(person, getAllItems());
   const hub = document.getElementById('hub');
+  const statusRing = document.getElementById('hub-status-ring');
   const hubInner = document.getElementById('hub-inner');
-  hub.style.background = conicGradientFor(stats);
-  const percent = stats.total === 0 ? 0 : Math.round(((stats.fulfilled + stats.partial * 0.5) / stats.total) * 100);
+
+  // Outer ring: how well status & desire line up (the "second color scale").
+  hub.style.background = alignmentGradientFor(alignStats);
+  // Inner ring: plain status distribution, as before.
+  statusRing.style.background = conicGradientFor(stats);
+
+  const fulfilledPercent = stats.total === 0 ? 0 : Math.round((stats.fulfilled / stats.total) * 100);
+  const alignPercentLabel = alignStats.percent === null ? '–%' : `${alignStats.percent}%`;
+
   hubInner.innerHTML = `
     <div class="hub-name">${escapeHtml(person.name)}</div>
-    <div class="hub-percent">${percent}%</div>
-    <div class="hub-sub">${stats.fulfilled}/${stats.total} erfüllt</div>
+    <div class="hub-percent">${alignPercentLabel}</div>
+    <div class="hub-sub">Übereinstimmung (${alignStats.rated}/${alignStats.total} bewertet)</div>
+    <div class="hub-sub-secondary">${fulfilledPercent}% erfüllt</div>
   `;
 }
 
@@ -299,20 +342,26 @@ function renderOverview() {
   const listEl = document.getElementById('overview-list');
 
   const overall = computeOverallStats(person);
-  const overallPercent = overall.total === 0 ? 0 : Math.round((overall.fulfilled / overall.total) * 100);
+  const overallAlign = computeAlignmentStats(person, getAllItems());
+  const fulfilledPercent = overall.total === 0 ? 0 : Math.round((overall.fulfilled / overall.total) * 100);
+  const alignPercentLabel = overallAlign.percent === null ? '–%' : `${overallAlign.percent}%`;
+
   totalEl.innerHTML = `
-    <div class="big-percent">${overallPercent}%</div>
-    <div>vollständig erfüllt für <strong>${escapeHtml(person.name)}</strong>
+    <div class="big-percent">${alignPercentLabel}</div>
+    <div class="overview-total-label">Übereinstimmung von Wunsch &amp; Status für <strong>${escapeHtml(person.name)}</strong>
+      (${overallAlign.rated}/${overallAlign.total} Punkte bewertet)</div>
+    <div class="overview-total-sub">${fulfilledPercent}% erfüllt
       (${overall.fulfilled}/${overall.total}, +${overall.partial} teilweise,
       ${overall.unanswered} unbeantwortet)</div>
-    ${overall.mismatches > 0
-      ? `<div class="mismatch-summary">⚠ ${overall.mismatches} Diskrepanz(en) zwischen Wunsch und Status — lohnt sich zu besprechen</div>`
+    ${overallAlign.misaligned > 0
+      ? `<div class="mismatch-summary">⚠ ${overallAlign.misaligned} Diskrepanz(en) zwischen Wunsch und Status — lohnt sich zu besprechen</div>`
       : ''}
   `;
 
   listEl.innerHTML = '';
   RA_CATEGORIES.forEach((category) => {
     const stats = computeCategoryStats(person, category);
+    const alignStats = computeAlignmentStats(person, category.items);
     const fPct = stats.total === 0 ? 0 : (stats.fulfilled / stats.total) * 100;
     const pPct = stats.total === 0 ? 0 : (stats.partial / stats.total) * 100;
     const uPct = stats.total === 0 ? 0 : (stats.unfulfilled / stats.total) * 100;
@@ -324,7 +373,7 @@ function renderOverview() {
         <span class="cat-title">${escapeHtml(category.title)}</span>
         <span class="cat-count">
           ${stats.fulfilled}/${stats.total}
-          ${stats.mismatches > 0 ? `<span class="mismatch-flag" title="${stats.mismatches} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${stats.mismatches}</span>` : ''}
+          ${alignStats.misaligned > 0 ? `<span class="mismatch-flag" title="${alignStats.misaligned} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${alignStats.misaligned}</span>` : ''}
         </span>
       </div>
       <div class="progress-bar">

@@ -40,6 +40,16 @@
       <span class="legend-item"><span class="swatch swatch--unanswered"></span> unbeantwortet</span>
     </div>
   </div>
+
+  <div class="topbar-row">
+    <div class="legend legend--align">
+      <span class="legend-label">Übereinstimmung (Hub-Außenring):</span>
+      <span class="legend-item"><span class="swatch swatch--align-good"></span> passt zusammen</span>
+      <span class="legend-item"><span class="swatch swatch--align-partial"></span> teilweise</span>
+      <span class="legend-item"><span class="swatch swatch--align-bad"></span> Diskrepanz</span>
+      <span class="legend-item"><span class="swatch swatch--align-unrated"></span> unbewertet</span>
+    </div>
+  </div>
 </header>
 
 <main>
@@ -51,12 +61,17 @@
       du sowohl den <strong>Status</strong> (erfüllt/teilweise/nicht
       erfüllt/unbeantwortet) als auch den <strong>Wunsch</strong>
       (gewünscht/nicht gewünscht) an — ⚠ markiert Punkte, bei denen beides
-      nicht zusammenpasst und die sich zu besprechen lohnen.
+      nicht zusammenpasst und die sich zu besprechen lohnen. Die große Zahl
+      in der Mitte zeigt, wie gut Wunsch &amp; Status bei den bereits
+      bewerteten Punkten übereinstimmen (Außenring) — nicht einfach, wie
+      viel erfüllt ist (das steht klein darunter, Innenring).
     </p>
     <div class="board-wrap" id="board-wrap">
       <div id="board-rings"></div>
       <div class="hub" id="hub">
-        <div class="hub-inner" id="hub-inner"></div>
+        <div class="hub-status-ring" id="hub-status-ring">
+          <div class="hub-inner" id="hub-inner"></div>
+        </div>
       </div>
     </div>
   </section>
