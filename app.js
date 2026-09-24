@@ -149,34 +149,46 @@ function renderPeopleBar() {
 // Rendering: circular board
 // ---------------------------------------------------------------------
 
-function layoutRing(categories, radiusPercent) {
+// Positions categories evenly around a circle. Every other item alternates
+// between the two given radii (a "zigzag"), which gives neighboring cards
+// more tangential breathing room than a single perfect circle would —
+// important since card size now varies with label length. `radii` should
+// both stay on the same side of the other ring's radii (e.g. both >= the
+// inner ring's radii for the outer ring) so the two rings never drift
+// toward each other and collide.
+function layoutRing(categories, radii) {
   const n = categories.length;
   return categories.map((category, i) => {
     const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-    const x = 50 + radiusPercent * Math.cos(angle);
-    const y = 50 + radiusPercent * Math.sin(angle);
+    const radius = radii[i % radii.length];
+    const x = 50 + radius * Math.cos(angle);
+    const y = 50 + radius * Math.sin(angle);
     return { category, x, y };
   });
 }
 
 function createBubbleElement(category, x, y, ringClass, person) {
   const stats = computeCategoryStats(person, category);
+  const fPct = stats.total === 0 ? 0 : (stats.fulfilled / stats.total) * 100;
+  const pPct = stats.total === 0 ? 0 : (stats.partial / stats.total) * 100;
+
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = `bubble bubble--${ringClass}`;
   btn.style.setProperty('--x', x + '%');
   btn.style.setProperty('--y', y + '%');
-  btn.style.background = conicGradientFor(stats);
   btn.dataset.categoryId = category.id;
   btn.setAttribute(
     'aria-label',
     `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise`
   );
   btn.innerHTML = `
-    <span class="bubble-inner">
-      <span class="bubble-label">${escapeHtml(category.title)}</span>
-      <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
+    <span class="bubble-label">${escapeHtml(category.title)}</span>
+    <span class="bubble-progress">
+      <span class="progress-fulfilled" style="width:${fPct}%"></span>
+      <span class="progress-partial" style="width:${pPct}%"></span>
     </span>
+    <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
   `;
   btn.addEventListener('click', () => openCategoryPanel(category.id));
   return btn;
@@ -190,10 +202,10 @@ function renderBoard() {
   const outer = RA_CATEGORIES.filter((c) => c.ring === 'outer');
   const inner = RA_CATEGORIES.filter((c) => c.ring === 'inner');
 
-  layoutRing(outer, 44).forEach(({ category, x, y }) => {
+  layoutRing(outer, [45, 50]).forEach(({ category, x, y }) => {
     container.appendChild(createBubbleElement(category, x, y, 'outer', person));
   });
-  layoutRing(inner, 27).forEach(({ category, x, y }) => {
+  layoutRing(inner, [28, 22]).forEach(({ category, x, y }) => {
     container.appendChild(createBubbleElement(category, x, y, 'inner', person));
   });
 
