@@ -95,6 +95,13 @@ select#person-select {
   line-height: 1;
 }
 
+.btn-done-active {
+  background: var(--color-fulfilled);
+  color: #fff;
+  border-color: var(--color-fulfilled);
+}
+.btn-done-active:hover { background: var(--color-fulfilled); }
+
 .tabs {
   display: flex;
   gap: 0.3rem;
@@ -449,6 +456,157 @@ main {
 .progress-fulfilled { background: var(--color-fulfilled); }
 .progress-partial { background: var(--color-partial); }
 .progress-unfulfilled { background: var(--color-unfulfilled); }
+
+/* ---------- Match tab ---------- */
+
+.match-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.match-select-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.match-select-label select {
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  font-size: 0.9rem;
+  color: var(--color-ink);
+  min-width: 160px;
+}
+
+.match-vs {
+  font-size: 1.2rem;
+  color: var(--color-muted);
+  padding-bottom: 0.5rem;
+}
+
+.match-locked {
+  max-width: 420px;
+  margin: 1rem auto 0;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.match-locked-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.match-summary {
+  max-width: 640px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.match-summary .big-percent {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.match-summary-label {
+  font-size: 0.9rem;
+}
+
+.match-all-good {
+  text-align: center;
+  color: var(--color-match);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.discuss-list {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.discuss-group { margin-bottom: 1.5rem; }
+
+.discuss-group-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+  margin: 0 0 0.6rem;
+}
+
+.discuss-item {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 0.7rem;
+  background: #fff;
+}
+
+.discuss-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.discuss-tag {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-mismatch);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  white-space: nowrap;
+}
+
+.discuss-compare {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.discuss-side {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.discuss-side-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.chip {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  width: fit-content;
+  color: #fff;
+}
+
+.chip--status-unanswered,
+.chip--desire-unanswered { background: var(--color-unanswered); color: var(--color-ink); }
+.chip--status-unfulfilled { background: var(--color-unfulfilled); }
+.chip--status-partial { background: var(--color-partial); }
+.chip--status-fulfilled { background: var(--color-fulfilled); }
+.chip--desire-unwanted { background: var(--color-unwanted); }
+.chip--desire-wanted { background: var(--color-wanted); }
 
 /* ---------- Side panel ---------- */
 

@@ -46,6 +46,11 @@ const DEFAULT_DESIRE = DESIRE.UNANSWERED;
 let state = loadState();
 let currentPanelCategoryId = null;
 
+// Which two people are currently selected in the Match tab. Kept outside
+// `state` on purpose — it's just a view preference, not data worth
+// persisting/exporting.
+let matchSelection = { aId: null, bId: null };
+
 // ---------------------------------------------------------------------
 // State helpers
 // ---------------------------------------------------------------------
@@ -55,7 +60,7 @@ function uid() {
 }
 
 function createPerson(name) {
-  return { id: uid(), name, items: {} };
+  return { id: uid(), name, items: {}, done: false };
 }
 
 function createDefaultState() {
@@ -74,7 +79,10 @@ function loadState() {
     if (!parsed.selectedPersonId || !parsed.people.some((p) => p.id === parsed.selectedPersonId)) {
       parsed.selectedPersonId = parsed.people[0].id;
     }
-    parsed.people.forEach((p) => { if (!p.items) p.items = {}; });
+    parsed.people.forEach((p) => {
+      if (!p.items) p.items = {};
+      if (typeof p.done !== 'boolean') p.done = false;
+    });
     return parsed;
   } catch (err) {
     console.error('Konnte gespeicherte Daten nicht laden, starte mit Standardzustand.', err);
@@ -193,6 +201,52 @@ function computeAlignmentStats(person, items) {
   return { total, rated, aligned, partial, misaligned, unrated, percent };
 }
 
+// ---------------------------------------------------------------------
+// Match / comparison between two people's boards
+// ---------------------------------------------------------------------
+
+// Compares person A's and person B's entry for one item. Only flags a
+// difference on a dimension if BOTH sides actually answered it — an
+// unanswered side just means "not comparable yet", not a discrepancy.
+function compareEntries(entryA, entryB) {
+  const desireDiff =
+    entryA.desire !== DESIRE.UNANSWERED &&
+    entryB.desire !== DESIRE.UNANSWERED &&
+    entryA.desire !== entryB.desire;
+  const statusDiff =
+    entryA.status !== STATUS.UNANSWERED &&
+    entryB.status !== STATUS.UNANSWERED &&
+    entryA.status !== entryB.status;
+  const comparable =
+    (entryA.desire !== DESIRE.UNANSWERED && entryB.desire !== DESIRE.UNANSWERED) ||
+    (entryA.status !== STATUS.UNANSWERED && entryB.status !== STATUS.UNANSWERED);
+  return { desireDiff, statusDiff, comparable, needsDiscussion: desireDiff || statusDiff };
+}
+
+// Builds the full comparison between two people across all items: which
+// ones are worth discussing (desire and/or perceived status differ) and an
+// overall agreement percentage over everything that was comparable at all.
+function computeMatchResult(personA, personB) {
+  const items = getAllItems();
+  let comparable = 0;
+  let agree = 0;
+  const discuss = [];
+  items.forEach((item) => {
+    const entryA = getItemEntry(personA, item.id);
+    const entryB = getItemEntry(personB, item.id);
+    const cmp = compareEntries(entryA, entryB);
+    if (!cmp.comparable) return;
+    comparable++;
+    if (cmp.needsDiscussion) {
+      discuss.push({ item, entryA, entryB, ...cmp });
+    } else {
+      agree++;
+    }
+  });
+  const percent = comparable === 0 ? null : Math.round((agree / comparable) * 100);
+  return { comparable, agree, discuss, percent, total: items.length };
+}
+
 function conicGradientFor(stats) {
   if (stats.total === 0) return 'var(--color-unanswered)';
   const fEnd = (stats.fulfilled / stats.total) * 100;
@@ -221,16 +275,25 @@ function escapeHtml(str) {
 // Rendering: people bar
 // ---------------------------------------------------------------------
 
+function personOptionLabel(person) {
+  return person.done ? `${person.name} ✓` : person.name;
+}
+
 function renderPeopleBar() {
   const select = document.getElementById('person-select');
   select.innerHTML = '';
   state.people.forEach((person) => {
     const opt = document.createElement('option');
     opt.value = person.id;
-    opt.textContent = person.name;
+    opt.textContent = personOptionLabel(person);
     if (person.id === state.selectedPersonId) opt.selected = true;
     select.appendChild(opt);
   });
+
+  const doneBtn = document.getElementById('btn-toggle-done');
+  const current = getSelectedPerson();
+  doneBtn.textContent = current.done ? '↩ Bearbeitung fortsetzen' : 'Als fertig markieren';
+  doneBtn.classList.toggle('btn-done-active', current.done);
 }
 
 // ---------------------------------------------------------------------
@@ -391,6 +454,158 @@ function renderOverview() {
 }
 
 // ---------------------------------------------------------------------
+// Rendering: match tab
+// ---------------------------------------------------------------------
+
+// Keeps matchSelection valid as people get added/renamed/deleted, and picks
+// sensible defaults (first two distinct people) the first time around.
+function ensureMatchSelection() {
+  const ids = state.people.map((p) => p.id);
+  if (!matchSelection.aId || !ids.includes(matchSelection.aId)) {
+    matchSelection.aId = ids[0] || null;
+  }
+  if (!matchSelection.bId || !ids.includes(matchSelection.bId) || matchSelection.bId === matchSelection.aId) {
+    matchSelection.bId = ids.find((id) => id !== matchSelection.aId) || null;
+  }
+}
+
+function renderMatchSelects() {
+  const selectA = document.getElementById('match-select-a');
+  const selectB = document.getElementById('match-select-b');
+  [selectA, selectB].forEach((select, idx) => {
+    const current = idx === 0 ? matchSelection.aId : matchSelection.bId;
+    select.innerHTML = '';
+    state.people.forEach((person) => {
+      const opt = document.createElement('option');
+      opt.value = person.id;
+      opt.textContent = personOptionLabel(person);
+      if (person.id === current) opt.selected = true;
+      select.appendChild(opt);
+    });
+  });
+}
+
+function discussRowHtml({ item, entryA, entryB, desireDiff, statusDiff }, personA, personB) {
+  const tag =
+    desireDiff && statusDiff
+      ? 'Wunsch &amp; Wahrnehmung'
+      : desireDiff
+      ? 'Wunsch-Unterschied'
+      : 'Wahrnehmungs-Unterschied';
+  return `
+    <div class="discuss-item">
+      <div class="discuss-item-head">
+        <span class="item-label">${escapeHtml(item.label)}</span>
+        <span class="discuss-tag">${tag}</span>
+      </div>
+      ${ITEM_TRANSLATIONS[item.id]
+        ? `<div class="item-translation">${escapeHtml(ITEM_TRANSLATIONS[item.id])}</div>`
+        : ''}
+      <div class="discuss-compare">
+        <div class="discuss-side">
+          <div class="discuss-side-name">${escapeHtml(personA.name)}</div>
+          <span class="chip chip--status chip--status-${entryA.status}">${STATUS_LABELS[entryA.status]}</span>
+          <span class="chip chip--desire chip--desire-${entryA.desire}">${DESIRE_LABELS[entryA.desire]}</span>
+        </div>
+        <div class="discuss-side">
+          <div class="discuss-side-name">${escapeHtml(personB.name)}</div>
+          <span class="chip chip--status chip--status-${entryB.status}">${STATUS_LABELS[entryB.status]}</span>
+          <span class="chip chip--desire chip--desire-${entryB.desire}">${DESIRE_LABELS[entryB.desire]}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMatchView() {
+  ensureMatchSelection();
+  renderMatchSelects();
+  const body = document.getElementById('match-body');
+
+  if (state.people.length < 2) {
+    body.innerHTML = `
+      <p class="hint">
+        Du brauchst mindestens zwei Personen für einen Vergleich. Lege oben
+        eine zweite Person an, oder importiere die exportierte
+        Personen-Datei deiner Partnerin/deines Partners über
+        "Person importieren".
+      </p>
+    `;
+    return;
+  }
+
+  const personA = state.people.find((p) => p.id === matchSelection.aId);
+  const personB = state.people.find((p) => p.id === matchSelection.bId);
+  if (!personA || !personB) return;
+
+  if (personA.id === personB.id) {
+    body.innerHTML = `<p class="hint">Bitte wähle zwei unterschiedliche Personen aus.</p>`;
+    return;
+  }
+
+  const missingDone = [personA, personB].filter((p) => !p.done);
+  if (missingDone.length > 0) {
+    body.innerHTML = `
+      <div class="match-locked">
+        <div class="match-locked-icon">🔒</div>
+        <p>
+          Der Vergleich ist noch gesperrt, damit ihr euch beim Ausfüllen
+          nicht gegenseitig beeinflusst.
+        </p>
+        <p>
+          Noch nicht als "fertig" markiert:
+          <strong>${missingDone.map((p) => escapeHtml(p.name)).join(', ')}</strong>.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  const result = computeMatchResult(personA, personB);
+  const percentLabel = result.percent === null ? '–%' : `${result.percent}%`;
+
+  let listHtml;
+  if (result.comparable === 0) {
+    listHtml = `<p class="hint">Noch keine gemeinsam beantworteten Punkte — füllt zuerst ein paar Elemente auf beiden Boards aus.</p>`;
+  } else if (result.discuss.length === 0) {
+    listHtml = `<p class="match-all-good">🎉 Keine Diskrepanzen gefunden — bei allen gemeinsam beantworteten Punkten stimmen Wunsch und Status überein.</p>`;
+  } else {
+    const grouped = new Map();
+    result.discuss.forEach((entry) => {
+      const category = RA_CATEGORIES.find((c) => c.items.some((i) => i.id === entry.item.id));
+      const key = category ? category.title : '';
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(entry);
+    });
+    listHtml = Array.from(grouped.entries())
+      .map(
+        ([title, entries]) => `
+          <div class="discuss-group">
+            <h3 class="discuss-group-title">${escapeHtml(title)}</h3>
+            ${entries.map((e) => discussRowHtml(e, personA, personB)).join('')}
+          </div>
+        `
+      )
+      .join('');
+  }
+
+  body.innerHTML = `
+    <div class="match-summary">
+      <div class="big-percent">${percentLabel}</div>
+      <div class="match-summary-label">
+        Übereinstimmung zwischen <strong>${escapeHtml(personA.name)}</strong> und
+        <strong>${escapeHtml(personB.name)}</strong>
+        (${result.agree}/${result.comparable} gemeinsam beantworteten Punkten)
+      </div>
+      ${result.discuss.length > 0
+        ? `<div class="mismatch-summary">⚠ ${result.discuss.length} Punkt(e) zu besprechen</div>`
+        : ''}
+    </div>
+    <div class="discuss-list">${listHtml}</div>
+  `;
+}
+
+// ---------------------------------------------------------------------
 // Rendering: side panel
 // ---------------------------------------------------------------------
 
@@ -515,6 +730,7 @@ function closeCategoryPanel() {
 function refreshBackgroundViews() {
   renderBoard();
   renderOverview();
+  renderMatchView();
 }
 
 // ---------------------------------------------------------------------
@@ -529,6 +745,8 @@ function switchView(view) {
   });
   document.getElementById('view-board').classList.toggle('hidden', view !== 'board');
   document.getElementById('view-overview').classList.toggle('hidden', view !== 'overview');
+  document.getElementById('view-match').classList.toggle('hidden', view !== 'match');
+  if (view === 'match') renderMatchView();
 }
 
 // ---------------------------------------------------------------------
@@ -563,6 +781,15 @@ function deletePerson() {
   if (!confirm(`Board für "${person.name}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
   state.people = state.people.filter((p) => p.id !== person.id);
   state.selectedPersonId = state.people[0].id;
+  saveState();
+  renderApp();
+}
+
+// Marks the currently selected person as "done" filling out their board, so
+// their data becomes eligible for the (blind-until-both-done) Match view.
+function togglePersonDone() {
+  const person = getSelectedPerson();
+  person.done = !person.done;
   saveState();
   renderApp();
 }
@@ -614,6 +841,62 @@ function importData(file) {
   reader.readAsText(file);
 }
 
+// Exports just the currently selected person — meant to be sent to a
+// partner so they can import it into their own copy of the app without
+// wiping out their own board(s). Wrapped with a tiny marker so import can
+// tell it apart from a full backup.
+function exportPerson() {
+  const person = getSelectedPerson();
+  const payload = { kind: 'ra-smorgasbord-person', person };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const safeName = person.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'person';
+  a.download = `ra-smorgasbord-person-${safeName}-${dateStamp()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Imports a single-person file exported via exportPerson(). Adds it as a
+// new person alongside the existing ones (doesn't touch anyone else's
+// data). If a person with the same id already exists — e.g. re-importing
+// an updated export from the same partner — asks before overwriting just
+// that one person.
+function importPersonFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(String(reader.result));
+      const person = parsed && parsed.kind === 'ra-smorgasbord-person' ? parsed.person : null;
+      if (!person || !person.id || !person.name || typeof person.items !== 'object') {
+        throw new Error('Ungültiges Format');
+      }
+      if (!person.items) person.items = {};
+      if (typeof person.done !== 'boolean') person.done = false;
+
+      const existingIndex = state.people.findIndex((p) => p.id === person.id);
+      if (existingIndex !== -1) {
+        const existingName = state.people[existingIndex].name;
+        if (!confirm(`"${existingName}" ist bereits vorhanden. Mit den importierten Daten aktualisieren?`)) return;
+        state.people[existingIndex] = person;
+      } else {
+        state.people.push(person);
+      }
+      state.selectedPersonId = person.id;
+      saveState();
+      renderApp();
+      alert(`Person "${person.name}" wurde importiert.`);
+    } catch (err) {
+      console.error(err);
+      alert('Import fehlgeschlagen: Das ist keine gültige Personen-Datei (nutze "Person teilen" zum Exportieren).');
+    }
+  };
+  reader.readAsText(file);
+}
+
 // ---------------------------------------------------------------------
 // Wire up static event listeners (once)
 // ---------------------------------------------------------------------
@@ -628,6 +911,7 @@ function initEventListeners() {
   document.getElementById('btn-add-person').addEventListener('click', addPerson);
   document.getElementById('btn-rename-person').addEventListener('click', renamePerson);
   document.getElementById('btn-delete-person').addEventListener('click', deletePerson);
+  document.getElementById('btn-toggle-done').addEventListener('click', togglePersonDone);
 
   document.getElementById('btn-export').addEventListener('click', exportData);
 
@@ -638,6 +922,26 @@ function initEventListeners() {
       importData(fileInput.files[0]);
     }
     fileInput.value = '';
+  });
+
+  document.getElementById('btn-export-person').addEventListener('click', exportPerson);
+
+  const filePersonInput = document.getElementById('file-import-person');
+  document.getElementById('btn-import-person').addEventListener('click', () => filePersonInput.click());
+  filePersonInput.addEventListener('change', () => {
+    if (filePersonInput.files && filePersonInput.files[0]) {
+      importPersonFile(filePersonInput.files[0]);
+    }
+    filePersonInput.value = '';
+  });
+
+  document.getElementById('match-select-a').addEventListener('change', (e) => {
+    matchSelection.aId = e.target.value;
+    renderMatchView();
+  });
+  document.getElementById('match-select-b').addEventListener('change', (e) => {
+    matchSelection.bId = e.target.value;
+    renderMatchView();
   });
 
   document.querySelectorAll('.tab').forEach((tab) => {
@@ -663,6 +967,7 @@ function renderApp() {
   renderPeopleBar();
   renderBoard();
   renderOverview();
+  renderMatchView();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

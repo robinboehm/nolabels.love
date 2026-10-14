@@ -18,11 +18,15 @@
       <button id="btn-add-person" class="btn btn-icon" title="Person hinzufügen">＋</button>
       <button id="btn-rename-person" class="btn btn-icon" title="Person umbenennen">✎</button>
       <button id="btn-delete-person" class="btn btn-icon" title="Person löschen">🗑</button>
+      <button id="btn-toggle-done" class="btn" title="Markiert diese Person als fertig mit dem Ausfüllen, damit sie im Match-Vergleich berücksichtigt wird">Als fertig markieren</button>
     </div>
 
     <div class="data-controls">
-      <button id="btn-export" class="btn">Export</button>
-      <button id="btn-import" class="btn">Import</button>
+      <button id="btn-export-person" class="btn" title="Nur die aktuell ausgewählte Person als Datei exportieren, zum Teilen mit der Partnerin/dem Partner">Person teilen</button>
+      <button id="btn-import-person" class="btn" title="Eine geteilte Person-Datei importieren, ohne die anderen Personen zu überschreiben">Person importieren</button>
+      <input type="file" id="file-import-person" accept="application/json" class="sr-only" />
+      <button id="btn-export" class="btn" title="Alle Personen als vollständiges Backup exportieren">Alles exportieren</button>
+      <button id="btn-import" class="btn" title="Vollständiges Backup laden (ersetzt alle aktuellen Daten)">Alles importieren</button>
       <input type="file" id="file-import" accept="application/json" class="sr-only" />
     </div>
   </div>
@@ -31,6 +35,7 @@
     <nav class="tabs" role="tablist" aria-label="Ansicht">
       <button class="tab active" data-view="board" role="tab" aria-selected="true">Board</button>
       <button class="tab" data-view="overview" role="tab" aria-selected="false">Übersicht</button>
+      <button class="tab" data-view="match" role="tab" aria-selected="false">Match</button>
     </nav>
 
     <div class="legend">
@@ -79,6 +84,30 @@
   <section id="view-overview" class="view hidden">
     <div id="overview-total" class="overview-total"></div>
     <div id="overview-list" class="overview-list"></div>
+  </section>
+
+  <section id="view-match" class="view hidden">
+    <p class="hint">
+      Vergleiche die Boards von zwei Personen, die unabhängig voneinander für
+      dieselbe Beziehung ausgefüllt haben (z.&nbsp;B. "Ich" und "Alex"). Fülle
+      dazu jeweils ein eigenes Personen-Profil aus, markiere es oben als
+      <strong>"fertig"</strong> und importiere ggf. die exportierte Datei
+      deiner Partnerin/deines Partners über <strong>"Person importieren"</strong>.
+      Solange nicht beide Seiten fertig sind, bleiben die Ergebnisse
+      verborgen, damit ihr euch beim Ausfüllen nicht gegenseitig beeinflusst.
+    </p>
+    <div class="match-controls">
+      <label class="match-select-label">
+        Person A
+        <select id="match-select-a"></select>
+      </label>
+      <span class="match-vs">↔</span>
+      <label class="match-select-label">
+        Person B
+        <select id="match-select-b"></select>
+      </label>
+    </div>
+    <div id="match-body"></div>
   </section>
 </main>
 
