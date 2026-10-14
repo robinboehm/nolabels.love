@@ -7,7 +7,7 @@ inklusive optionaler Notizen pro Punkt.
 
 Pro Element werden zwei unabhängige Dimensionen erfasst:
 
-- **Status**: erfüllt / teilweise erfüllt / nicht erfüllt / bisher unbeantwortet
+- **Status**: erfüllt / eher ja (teilweise) / eher nicht (teilweise) / nicht erfüllt / bisher unbeantwortet
 - **Wunsch**: gewünscht / nicht gewünscht / bisher unbeantwortet
 
 Das trennt bewusst "ist es (nicht) so?" von "will ich das (nicht)?" — ein

@@ -603,7 +603,8 @@ main {
 .chip--status-unanswered,
 .chip--desire-unanswered { background: var(--color-unanswered); color: var(--color-ink); }
 .chip--status-unfulfilled { background: var(--color-unfulfilled); }
-.chip--status-partial { background: var(--color-partial); }
+.chip--status-partial-no,
+.chip--status-partial-yes { background: var(--color-partial); }
 .chip--status-fulfilled { background: var(--color-fulfilled); }
 .chip--desire-unwanted { background: var(--color-unwanted); }
 .chip--desire-wanted { background: var(--color-wanted); }
@@ -732,7 +733,8 @@ main {
 
 .status-btn--unanswered.active { background: var(--color-unanswered); color: var(--color-ink); }
 .status-btn--unfulfilled.active { background: var(--color-unfulfilled); color: #fff; }
-.status-btn--partial.active { background: var(--color-partial); color: #fff; }
+.status-btn--partial-no.active,
+.status-btn--partial-yes.active { background: var(--color-partial); color: #fff; }
 .status-btn--fulfilled.active { background: var(--color-fulfilled); color: #fff; }
 
 .desire-btn--unanswered.active { background: var(--color-unanswered); color: var(--color-ink); }

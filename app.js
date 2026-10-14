@@ -10,16 +10,37 @@ const STORAGE_KEY = 'ra-smorgasbord-data-v1';
 const STATUS = {
   UNANSWERED: 'unanswered',
   UNFULFILLED: 'unfulfilled',
-  PARTIAL: 'partial',
+  PARTIAL_NO: 'partial-no',
+  PARTIAL_YES: 'partial-yes',
   FULFILLED: 'fulfilled',
 };
 
 const STATUS_LABELS = {
   [STATUS.UNANSWERED]: 'unbeantwortet',
   [STATUS.UNFULFILLED]: 'nicht erfüllt',
-  [STATUS.PARTIAL]: 'teilweise',
+  [STATUS.PARTIAL_NO]: 'eher nicht',
+  [STATUS.PARTIAL_YES]: 'eher ja',
   [STATUS.FULFILLED]: 'erfüllt',
 };
+
+// The two middle statuses ("eher nicht" / "eher ja") are a finer-grained
+// split of what used to be a single "teilweise" state. They're still
+// treated as one bucket for coloring/aggregation (both render as the
+// "partial" amber tone) — this just checks membership in that bucket.
+function isPartialStatus(status) {
+  return status === STATUS.PARTIAL_NO || status === STATUS.PARTIAL_YES;
+}
+
+// Backwards-compat: boards saved before this split used a single literal
+// 'partial' status value. Map it onto 'partial-yes' (closer to the old
+// "counts for something" framing) so old data doesn't silently collapse
+// into "unbeantwortet".
+function migratePerson(person) {
+  Object.values(person.items || {}).forEach((entry) => {
+    if (entry && entry.status === 'partial') entry.status = STATUS.PARTIAL_YES;
+  });
+  return person;
+}
 
 // Items without an explicit entry (or with this status) count as "not yet
 // discussed" rather than being lumped in with an active "nicht erfüllt"
@@ -82,6 +103,7 @@ function loadState() {
     parsed.people.forEach((p) => {
       if (!p.items) p.items = {};
       if (typeof p.done !== 'boolean') p.done = false;
+      migratePerson(p);
     });
     return parsed;
   } catch (err) {
@@ -125,11 +147,11 @@ function setItemNote(person, itemId, note) {
 
 // Whether the current status lines up with what's actually wanted.
 // Returns null when there isn't enough information yet (desire or status
-// still unanswered) or the status is "teilweise" (deliberately not judged
-// as a clean match or mismatch).
+// still unanswered) or the status is one of the "teilweise" states
+// (deliberately not judged as a clean match or mismatch).
 function computeMatch(entry) {
   if (entry.desire === DESIRE.UNANSWERED || entry.status === STATUS.UNANSWERED) return null;
-  if (entry.status === STATUS.PARTIAL) return null;
+  if (isPartialStatus(entry.status)) return null;
   const isFulfilled = entry.status === STATUS.FULFILLED;
   const isWanted = entry.desire === DESIRE.WANTED;
   return isFulfilled === isWanted ? 'match' : 'mismatch';
@@ -151,7 +173,7 @@ function computeCategoryStats(person, category) {
     const entry = person.items[item.id];
     if (!entry) return; // no entry yet -> counts as unanswered
     if (entry.status === STATUS.FULFILLED) fulfilled++;
-    else if (entry.status === STATUS.PARTIAL) partial++;
+    else if (isPartialStatus(entry.status)) partial++;
     else if (entry.status === STATUS.UNFULFILLED) unfulfilled++;
     // STATUS.UNANSWERED falls through and is covered by the remainder below
   });
@@ -192,7 +214,7 @@ function computeAlignmentStats(person, items) {
     const match = computeMatch(entry);
     if (match === 'match') aligned++;
     else if (match === 'mismatch') misaligned++;
-    else if (entry.status === STATUS.PARTIAL && entry.desire !== DESIRE.UNANSWERED) partial++;
+    else if (isPartialStatus(entry.status) && entry.desire !== DESIRE.UNANSWERED) partial++;
     else unrated++;
   });
   const total = items.length;
@@ -636,7 +658,8 @@ function openCategoryPanel(categoryId) {
         <div class="status-group" role="group" aria-label="Status für ${escapeHtml(item.label)}">
           <button type="button" class="status-btn status-btn--unanswered" data-status="${STATUS.UNANSWERED}">unbeantwortet</button>
           <button type="button" class="status-btn status-btn--unfulfilled" data-status="${STATUS.UNFULFILLED}">nicht erfüllt</button>
-          <button type="button" class="status-btn status-btn--partial" data-status="${STATUS.PARTIAL}">teilweise</button>
+          <button type="button" class="status-btn status-btn--partial-no" data-status="${STATUS.PARTIAL_NO}">eher nicht</button>
+          <button type="button" class="status-btn status-btn--partial-yes" data-status="${STATUS.PARTIAL_YES}">eher ja</button>
           <button type="button" class="status-btn status-btn--fulfilled" data-status="${STATUS.FULFILLED}">erfüllt</button>
         </div>
       </div>
@@ -825,7 +848,7 @@ function importData(file) {
         throw new Error('Ungültiges Format');
       }
       if (!confirm('Import ersetzt alle aktuellen Daten in dieser App. Fortfahren?')) return;
-      parsed.people.forEach((p) => { if (!p.items) p.items = {}; });
+      parsed.people.forEach((p) => { if (!p.items) p.items = {}; migratePerson(p); });
       if (!parsed.selectedPersonId || !parsed.people.some((p) => p.id === parsed.selectedPersonId)) {
         parsed.selectedPersonId = parsed.people[0].id;
       }
@@ -876,6 +899,7 @@ function importPersonFile(file) {
       }
       if (!person.items) person.items = {};
       if (typeof person.done !== 'boolean') person.done = false;
+      migratePerson(person);
 
       const existingIndex = state.people.findIndex((p) => p.id === person.id);
       if (existingIndex !== -1) {
