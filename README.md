@@ -37,6 +37,17 @@ Kein Build, kein Server, keine Installation nötig:
 4. Im **Übersicht**-Tab siehst du Fortschrittsbalken pro Kategorie sowie den
    Gesamtfortschritt.
 
+### Sprache
+
+Oben im Header lässt sich die komplette Oberfläche per **DE/EN**-Schalter
+umschalten — Kategorien, Items, Buttons, Hinweistexte und Dialoge wechseln
+mit. Die deutschen Kategorie-/Item-Bezeichnungen folgen der offiziellen
+deutschen Übersetzung des Smörgåsbords (v6, übersetzt von Rachel Cassandra).
+Im jeweils anderen Modus wird als graue Zweitzeile zusätzlich der Begriff in
+der anderen Sprache angezeigt. Die Sprachwahl wird pro Browser in
+`localStorage` gemerkt und ist unabhängig von den Personendaten (sie wird
+nicht mit exportiert/importiert).
+
 ## Daten & Privatsphäre
 
 Alle Daten werden ausschließlich lokal im Browser gespeichert
@@ -56,7 +67,7 @@ wenn dir die Daten wichtig sind.
 |---|---|
 | `index.html` | Grundgerüst, Steuerelemente, Panel-Markup |
 | `style.css` | Styling (Kreis-Board, Panel, Übersicht) |
-| `data.js` | Statische Smörgåsbord-Kategorien & Items (Original-Englisch) |
+| `data.js` | Statische Smörgåsbord-Kategorien & Items, EN + DE |
 | `app.js` | State-Management, Rendering, localStorage, Export/Import |
 
 ## Layout-Hinweis

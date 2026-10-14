@@ -6,6 +6,7 @@
  */
 
 const STORAGE_KEY = 'ra-smorgasbord-data-v1';
+const LANG_STORAGE_KEY = 'ra-smorgasbord-lang';
 
 const STATUS = {
   UNANSWERED: 'unanswered',
@@ -16,12 +17,16 @@ const STATUS = {
 };
 
 const STATUS_LABELS = {
-  [STATUS.UNANSWERED]: 'unbeantwortet',
-  [STATUS.UNFULFILLED]: 'nicht erfüllt',
-  [STATUS.PARTIAL_NO]: 'eher nicht',
-  [STATUS.PARTIAL_YES]: 'eher ja',
-  [STATUS.FULFILLED]: 'erfüllt',
+  [STATUS.UNANSWERED]: { de: 'unbeantwortet', en: 'unanswered' },
+  [STATUS.UNFULFILLED]: { de: 'nicht erfüllt', en: 'not fulfilled' },
+  [STATUS.PARTIAL_NO]: { de: 'eher nicht', en: 'leaning no' },
+  [STATUS.PARTIAL_YES]: { de: 'eher ja', en: 'leaning yes' },
+  [STATUS.FULFILLED]: { de: 'erfüllt', en: 'fulfilled' },
 };
+
+function statusLabel(status) {
+  return (STATUS_LABELS[status] || STATUS_LABELS[STATUS.UNANSWERED])[currentLang];
+}
 
 // The two middle statuses ("eher nicht" / "eher ja") are a finer-grained
 // split of what used to be a single "teilweise" state. They're still
@@ -57,12 +62,254 @@ const DESIRE = {
 };
 
 const DESIRE_LABELS = {
-  [DESIRE.UNANSWERED]: 'unbeantwortet',
-  [DESIRE.WANTED]: 'gewünscht',
-  [DESIRE.UNWANTED]: 'nicht gewünscht',
+  [DESIRE.UNANSWERED]: { de: 'unbeantwortet', en: 'unanswered' },
+  [DESIRE.WANTED]: { de: 'gewünscht', en: 'wanted' },
+  [DESIRE.UNWANTED]: { de: 'nicht gewünscht', en: 'not wanted' },
 };
 
+function desireLabel(desire) {
+  return (DESIRE_LABELS[desire] || DESIRE_LABELS[DESIRE.UNANSWERED])[currentLang];
+}
+
 const DEFAULT_DESIRE = DESIRE.UNANSWERED;
+
+// ---------------------------------------------------------------------
+// Language / i18n
+// ---------------------------------------------------------------------
+
+// Defaults to German since that's how this app has always worked; once a
+// user picks a language it's remembered (it's a device/UI preference, not
+// relationship data, so it's intentionally kept out of export/import).
+let currentLang = localStorage.getItem(LANG_STORAGE_KEY) === 'en' ? 'en' : 'de';
+
+// Every piece of static/chrome UI text, in both languages. Category and
+// item content itself lives in data.js (title/titleDe, label/labelDe).
+const STRINGS = {
+  personSrLabel: { de: 'Person', en: 'Person' },
+  btnAddPersonTitle: { de: 'Person hinzufügen', en: 'Add person' },
+  btnRenamePersonTitle: { de: 'Person umbenennen', en: 'Rename person' },
+  btnDeletePersonTitle: { de: 'Person löschen', en: 'Delete person' },
+  btnToggleDoneTitle: {
+    de: 'Markiert diese Person als fertig mit dem Ausfüllen, damit sie im Match-Vergleich berücksichtigt wird',
+    en: "Marks this person as done filling out their board so they're included in the match comparison",
+  },
+  btnToggleDoneLabel: { de: 'Als fertig markieren', en: 'Mark as done' },
+  btnToggleDoneLabelActive: { de: '↩ Bearbeitung fortsetzen', en: '↩ Resume editing' },
+  btnExportPersonLabel: { de: 'Person teilen', en: 'Share person' },
+  btnExportPersonTitle: {
+    de: 'Nur die aktuell ausgewählte Person als Datei exportieren, zum Teilen mit der Partnerin/dem Partner',
+    en: 'Export only the currently selected person as a file, to share with your partner',
+  },
+  btnImportPersonLabel: { de: 'Person importieren', en: 'Import person' },
+  btnImportPersonTitle: {
+    de: 'Eine geteilte Person-Datei importieren, ohne die anderen Personen zu überschreiben',
+    en: 'Import a shared person file without overwriting the other people',
+  },
+  btnExportLabel: { de: 'Alles exportieren', en: 'Export all' },
+  btnExportTitle: { de: 'Alle Personen als vollständiges Backup exportieren', en: 'Export all people as a full backup' },
+  btnImportLabel: { de: 'Alles importieren', en: 'Import all' },
+  btnImportTitle: {
+    de: 'Vollständiges Backup laden (ersetzt alle aktuellen Daten)',
+    en: 'Load a full backup (replaces all current data)',
+  },
+
+  tabsAriaLabel: { de: 'Ansicht', en: 'View' },
+  tabBoard: { de: 'Board', en: 'Board' },
+  tabOverview: { de: 'Übersicht', en: 'Overview' },
+  tabMatch: { de: 'Match', en: 'Match' },
+  langToggleAriaLabel: { de: 'Sprache', en: 'Language' },
+
+  legendFulfilled: { de: 'erfüllt', en: 'fulfilled' },
+  legendPartial: { de: 'teilweise', en: 'partial' },
+  legendUnfulfilled: { de: 'nicht erfüllt', en: 'not fulfilled' },
+  legendUnanswered: { de: 'unbeantwortet', en: 'unanswered' },
+  legendAlignLabel: { de: 'Übereinstimmung (Hub-Außenring):', en: 'Alignment (hub outer ring):' },
+  legendAlignGood: { de: 'passt zusammen', en: 'matches' },
+  legendAlignPartial: { de: 'teilweise', en: 'partial' },
+  legendAlignBad: { de: 'Diskrepanz', en: 'mismatch' },
+  legendAlignUnrated: { de: 'unbewertet', en: 'unrated' },
+
+  boardHint: {
+    de: 'Klicke auf eine Kategorie, um die Elemente zu bewerten. Die Kategorien sind lose sortiert: außen eher gesellschaftlich/strukturell, innen eher persönlich/intim — ganz wie im Original-Smörgåsbord. Pro Element gibst du sowohl den <strong>Status</strong> (erfüllt/teilweise/nicht erfüllt/unbeantwortet) als auch den <strong>Wunsch</strong> (gewünscht/nicht gewünscht) an — ⚠ markiert Punkte, bei denen beides nicht zusammenpasst und die sich zu besprechen lohnen. Die große Zahl in der Mitte zeigt, wie gut Wunsch &amp; Status bei den bereits bewerteten Punkten übereinstimmen (Außenring) — nicht einfach, wie viel erfüllt ist (das steht klein darunter, Innenring).',
+    en: "Click on a category to rate its items. Categories are loosely sorted: more societal/structural ones toward the outside, more personal/intimate ones toward the center — just like in the original Smörgåsbord. For each item you note both the <strong>status</strong> (fulfilled/partial/not fulfilled/unanswered) and the <strong>desire</strong> (wanted/not wanted) — ⚠ flags items where the two don't match and that are worth discussing. The big number in the middle shows how well desire &amp; status line up for already-rated items (outer ring) — not simply how much is fulfilled (that's the smaller number below it, inner ring).",
+  },
+  matchHint: {
+    de: 'Vergleiche die Boards von zwei Personen, die unabhängig voneinander für dieselbe Beziehung ausgefüllt haben (z.&nbsp;B. "Ich" und "Alex"). Fülle dazu jeweils ein eigenes Personen-Profil aus, markiere es oben als <strong>"fertig"</strong> und importiere ggf. die exportierte Datei deiner Partnerin/deines Partners über <strong>"Person importieren"</strong>. Solange nicht beide Seiten fertig sind, bleiben die Ergebnisse verborgen, damit ihr euch beim Ausfüllen nicht gegenseitig beeinflusst.',
+    en: 'Compare the boards of two people who filled them out independently for the same relationship (e.g.&nbsp;"Me" and "Alex"). Have each fill out their own person profile, mark it above as <strong>"done"</strong>, and import your partner\'s exported file via <strong>"Import person"</strong> if needed. Results stay hidden until both sides are done, so filling things out doesn\'t influence each other.',
+  },
+
+  matchLabelA: { de: 'Person A', en: 'Person A' },
+  matchLabelB: { de: 'Person B', en: 'Person B' },
+
+  panelCloseAriaLabel: { de: 'Schließen', en: 'Close' },
+  controlLabelStatus: { de: 'Status', en: 'Status' },
+  controlLabelDesire: { de: 'Wunsch', en: 'Desire' },
+  notePlaceholder: { de: 'Notiz (optional)', en: 'Note (optional)' },
+  statusGroupAriaLabel: { de: 'Status für {label}', en: 'Status for {label}' },
+  desireGroupAriaLabel: { de: 'Wunsch für {label}', en: 'Desire for {label}' },
+  noteToggleAriaLabel: { de: 'Notiz für {label}', en: 'Note for {label}' },
+  matchIndicatorMatchTitle: {
+    de: 'Passt zusammen: Wunsch und Status stimmen überein',
+    en: 'Matches: desire and status line up',
+  },
+  matchIndicatorMismatchTitle: {
+    de: 'Diskrepanz: Wunsch und Status stimmen nicht überein — vielleicht ansprechen?',
+    en: "Mismatch: desire and status don't line up — maybe worth discussing?",
+  },
+
+  footerText: {
+    de: 'Inhalte basieren auf dem <strong>Relationship Anarchy Smörgåsbord (v6)</strong> von Lyrica Lawrence &amp; Heather Orr, aktualisiert von Maxx Hill — lizenziert unter <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>. Diese App speichert alle Daten ausschließlich lokal in deinem Browser (localStorage) — nichts wird an einen Server gesendet.',
+    en: 'Content is based on the <strong>Relationship Anarchy Smörgåsbord (v6)</strong> by Lyrica Lawrence &amp; Heather Orr, updated by Maxx Hill — licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>. This app stores all data exclusively locally in your browser (localStorage) — nothing is sent to a server.',
+  },
+
+  bubbleAriaLabel: {
+    de: '{title}: {fulfilled} von {total} erfüllt, {partial} teilweise, {unanswered} unbeantwortet',
+    en: '{title}: {fulfilled} of {total} fulfilled, {partial} partial, {unanswered} unanswered',
+  },
+  bubbleAriaLabelMismatchSuffix: {
+    de: ', {count} Diskrepanz(en) zwischen Wunsch und Status',
+    en: ', {count} mismatch(es) between desire and status',
+  },
+  mismatchFlagTitle: {
+    de: '{count} Diskrepanz(en) zwischen Wunsch und Status',
+    en: '{count} mismatch(es) between desire and status',
+  },
+
+  hubSub: { de: 'Übereinstimmung ({rated}/{total} bewertet)', en: 'Alignment ({rated}/{total} rated)' },
+  hubSubSecondary: { de: '{percent}% erfüllt', en: '{percent}% fulfilled' },
+
+  overviewTotalLabel: {
+    de: 'Übereinstimmung von Wunsch &amp; Status für <strong>{name}</strong> ({rated}/{total} Punkte bewertet)',
+    en: 'Alignment of desire &amp; status for <strong>{name}</strong> ({rated}/{total} items rated)',
+  },
+  overviewTotalSub: {
+    de: '{percent}% erfüllt ({fulfilled}/{total}, +{partial} teilweise, {unanswered} unbeantwortet)',
+    en: '{percent}% fulfilled ({fulfilled}/{total}, +{partial} partial, {unanswered} unanswered)',
+  },
+  overviewMismatchSummary: {
+    de: '⚠ {count} Diskrepanz(en) zwischen Wunsch und Status — lohnt sich zu besprechen',
+    en: '⚠ {count} mismatch(es) between desire and status — worth discussing',
+  },
+
+  matchNeedTwoPeople: {
+    de: 'Du brauchst mindestens zwei Personen für einen Vergleich. Lege oben eine zweite Person an, oder importiere die exportierte Personen-Datei deiner Partnerin/deines Partners über "Person importieren".',
+    en: 'You need at least two people for a comparison. Add a second person above, or import your partner\'s exported person file via "Import person".',
+  },
+  matchChooseDifferent: { de: 'Bitte wähle zwei unterschiedliche Personen aus.', en: 'Please choose two different people.' },
+  matchLockedText: {
+    de: 'Der Vergleich ist noch gesperrt, damit ihr euch beim Ausfüllen nicht gegenseitig beeinflusst.',
+    en: "The comparison is still locked, so filling things out doesn't influence each other.",
+  },
+  matchLockedMissing: {
+    de: 'Noch nicht als "fertig" markiert: <strong>{names}</strong>.',
+    en: 'Not yet marked as "done": <strong>{names}</strong>.',
+  },
+  matchNoComparable: {
+    de: 'Noch keine gemeinsam beantworteten Punkte — füllt zuerst ein paar Elemente auf beiden Boards aus.',
+    en: 'No jointly answered items yet — fill out a few items on both boards first.',
+  },
+  matchAllGood: {
+    de: '🎉 Keine Diskrepanzen gefunden — bei allen gemeinsam beantworteten Punkten stimmen Wunsch und Status überein.',
+    en: '🎉 No mismatches found — desire and status line up for all jointly answered items.',
+  },
+  discussTagBoth: { de: 'Wunsch &amp; Wahrnehmung', en: 'Desire &amp; perception' },
+  discussTagDesire: { de: 'Wunsch-Unterschied', en: 'Desire difference' },
+  discussTagStatus: { de: 'Wahrnehmungs-Unterschied', en: 'Perception difference' },
+  matchSummaryLabel: {
+    de: 'Übereinstimmung zwischen <strong>{a}</strong> und <strong>{b}</strong> ({agree}/{comparable} gemeinsam beantworteten Punkten)',
+    en: 'Agreement between <strong>{a}</strong> and <strong>{b}</strong> ({agree}/{comparable} jointly answered items)',
+  },
+  matchDiscussSummary: { de: '⚠ {count} Punkt(e) zu besprechen', en: '⚠ {count} item(s) to discuss' },
+
+  promptPersonName: { de: 'Name der Person:', en: 'Name of the person:' },
+  promptNewName: { de: 'Neuer Name:', en: 'New name:' },
+  alertMinOnePerson: { de: 'Mindestens eine Person muss vorhanden sein.', en: 'At least one person must exist.' },
+  confirmDeletePerson: {
+    de: 'Board für "{name}" wirklich löschen? Das kann nicht rückgängig gemacht werden.',
+    en: 'Really delete the board for "{name}"? This cannot be undone.',
+  },
+  confirmImportAll: {
+    de: 'Import ersetzt alle aktuellen Daten in dieser App. Fortfahren?',
+    en: 'Importing replaces all current data in this app. Continue?',
+  },
+  alertImportSuccess: { de: 'Import erfolgreich.', en: 'Import successful.' },
+  alertImportFailure: {
+    de: 'Import fehlgeschlagen: Die Datei ist kein gültiges Backup.',
+    en: 'Import failed: the file is not a valid backup.',
+  },
+  confirmOverwritePerson: {
+    de: '"{name}" ist bereits vorhanden. Mit den importierten Daten aktualisieren?',
+    en: '"{name}" already exists. Update it with the imported data?',
+  },
+  alertPersonImported: { de: 'Person "{name}" wurde importiert.', en: 'Person "{name}" was imported.' },
+  alertPersonImportFailure: {
+    de: 'Import fehlgeschlagen: Das ist keine gültige Personen-Datei (nutze "Person teilen" zum Exportieren).',
+    en: 'Import failed: this is not a valid person file (use "Share person" to export one).',
+  },
+};
+
+/** Looks up a STRINGS entry for the current language, with {placeholder} interpolation. */
+function t(key, vars) {
+  const entry = STRINGS[key];
+  if (!entry) return key;
+  let str = entry[currentLang] || entry.de || entry.en || '';
+  if (vars) {
+    Object.keys(vars).forEach((k) => {
+      str = str.split(`{${k}}`).join(vars[k]);
+    });
+  }
+  return str;
+}
+
+/** Category title in the current language. */
+function categoryTitle(category) {
+  return currentLang === 'de' ? category.titleDe || category.title : category.title;
+}
+
+/** Item label in the current language. */
+function itemLabel(item) {
+  return currentLang === 'de' ? item.labelDe || item.label : item.label;
+}
+
+// Secondary, gray cross-reference line shown under an item (in the panel
+// and in Match discuss rows): the German UI shows the English original
+// term, the English UI shows the German translation + short explanation.
+function itemSecondary(item) {
+  return currentLang === 'de' ? item.label : ITEM_TRANSLATIONS[item.id] || null;
+}
+
+// Applies translated text to every statically-marked element in the page
+// (see data-i18n* attributes in index.html), and keeps the language
+// toggle's active state in sync. Dynamic content (board/overview/match/
+// panel) is refreshed separately via renderApp()/openCategoryPanel().
+function applyStaticTranslations() {
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+    el.title = t(el.dataset.i18nTitle);
+  });
+  document.querySelectorAll('[data-i18n-aria-label]').forEach((el) => {
+    el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+  });
+  document.querySelectorAll('.lang-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+}
+
+function setLang(lang) {
+  if (lang !== 'de' && lang !== 'en') return;
+  if (lang === currentLang) return;
+  currentLang = lang;
+  localStorage.setItem(LANG_STORAGE_KEY, lang);
+  applyStaticTranslations();
+  renderApp();
+  if (currentPanelCategoryId) openCategoryPanel(currentPanelCategoryId);
+}
 
 let state = loadState();
 let currentPanelCategoryId = null;
@@ -314,7 +561,7 @@ function renderPeopleBar() {
 
   const doneBtn = document.getElementById('btn-toggle-done');
   const current = getSelectedPerson();
-  doneBtn.textContent = current.done ? '↩ Bearbeitung fortsetzen' : 'Als fertig markieren';
+  doneBtn.textContent = current.done ? t('btnToggleDoneLabelActive') : t('btnToggleDoneLabel');
   doneBtn.classList.toggle('btn-done-active', current.done);
 }
 
@@ -353,14 +600,14 @@ function createBubbleElement(category, x, y, ringClass, person) {
   btn.style.setProperty('--x', x + '%');
   btn.style.setProperty('--y', y + '%');
   btn.dataset.categoryId = category.id;
+  const title = categoryTitle(category);
   btn.setAttribute(
     'aria-label',
-    `${category.title}: ${stats.fulfilled} von ${stats.total} erfüllt, ${stats.partial} teilweise, ` +
-      `${stats.unanswered} unbeantwortet` +
-      (alignStats.misaligned > 0 ? `, ${alignStats.misaligned} Diskrepanz(en) zwischen Wunsch und Status` : '')
+    t('bubbleAriaLabel', { title, fulfilled: stats.fulfilled, total: stats.total, partial: stats.partial, unanswered: stats.unanswered }) +
+      (alignStats.misaligned > 0 ? t('bubbleAriaLabelMismatchSuffix', { count: alignStats.misaligned }) : '')
   );
   btn.innerHTML = `
-    <span class="bubble-label">${escapeHtml(category.title)}</span>
+    <span class="bubble-label">${escapeHtml(title)}</span>
     <span class="bubble-progress">
       <span class="progress-fulfilled" style="width:${fPct}%"></span>
       <span class="progress-partial" style="width:${pPct}%"></span>
@@ -368,7 +615,7 @@ function createBubbleElement(category, x, y, ringClass, person) {
     </span>
     <span class="bubble-badge-row">
       <span class="bubble-badge">${stats.fulfilled}/${stats.total}</span>
-      ${alignStats.misaligned > 0 ? `<span class="mismatch-flag" title="${alignStats.misaligned} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${alignStats.misaligned}</span>` : ''}
+      ${alignStats.misaligned > 0 ? `<span class="mismatch-flag" title="${escapeHtml(t('mismatchFlagTitle', { count: alignStats.misaligned }))}">⚠ ${alignStats.misaligned}</span>` : ''}
     </span>
   `;
   btn.addEventListener('click', () => openCategoryPanel(category.id));
@@ -412,8 +659,8 @@ function renderHub() {
   hubInner.innerHTML = `
     <div class="hub-name">${escapeHtml(person.name)}</div>
     <div class="hub-percent">${alignPercentLabel}</div>
-    <div class="hub-sub">Übereinstimmung (${alignStats.rated}/${alignStats.total} bewertet)</div>
-    <div class="hub-sub-secondary">${fulfilledPercent}% erfüllt</div>
+    <div class="hub-sub">${t('hubSub', { rated: alignStats.rated, total: alignStats.total })}</div>
+    <div class="hub-sub-secondary">${t('hubSubSecondary', { percent: fulfilledPercent })}</div>
   `;
 }
 
@@ -433,13 +680,10 @@ function renderOverview() {
 
   totalEl.innerHTML = `
     <div class="big-percent">${alignPercentLabel}</div>
-    <div class="overview-total-label">Übereinstimmung von Wunsch &amp; Status für <strong>${escapeHtml(person.name)}</strong>
-      (${overallAlign.rated}/${overallAlign.total} Punkte bewertet)</div>
-    <div class="overview-total-sub">${fulfilledPercent}% erfüllt
-      (${overall.fulfilled}/${overall.total}, +${overall.partial} teilweise,
-      ${overall.unanswered} unbeantwortet)</div>
+    <div class="overview-total-label">${t('overviewTotalLabel', { name: escapeHtml(person.name), rated: overallAlign.rated, total: overallAlign.total })}</div>
+    <div class="overview-total-sub">${t('overviewTotalSub', { percent: fulfilledPercent, fulfilled: overall.fulfilled, total: overall.total, partial: overall.partial, unanswered: overall.unanswered })}</div>
     ${overallAlign.misaligned > 0
-      ? `<div class="mismatch-summary">⚠ ${overallAlign.misaligned} Diskrepanz(en) zwischen Wunsch und Status — lohnt sich zu besprechen</div>`
+      ? `<div class="mismatch-summary">${t('overviewMismatchSummary', { count: overallAlign.misaligned })}</div>`
       : ''}
   `;
 
@@ -455,10 +699,10 @@ function renderOverview() {
     row.className = 'overview-row';
     row.innerHTML = `
       <div class="overview-row-head">
-        <span class="cat-title">${escapeHtml(category.title)}</span>
+        <span class="cat-title">${escapeHtml(categoryTitle(category))}</span>
         <span class="cat-count">
           ${stats.fulfilled}/${stats.total}
-          ${alignStats.misaligned > 0 ? `<span class="mismatch-flag" title="${alignStats.misaligned} Diskrepanz(en) zwischen Wunsch und Status">⚠ ${alignStats.misaligned}</span>` : ''}
+          ${alignStats.misaligned > 0 ? `<span class="mismatch-flag" title="${escapeHtml(t('mismatchFlagTitle', { count: alignStats.misaligned }))}">⚠ ${alignStats.misaligned}</span>` : ''}
         </span>
       </div>
       <div class="progress-bar">
@@ -510,29 +754,28 @@ function renderMatchSelects() {
 function discussRowHtml({ item, entryA, entryB, desireDiff, statusDiff }, personA, personB) {
   const tag =
     desireDiff && statusDiff
-      ? 'Wunsch &amp; Wahrnehmung'
+      ? t('discussTagBoth')
       : desireDiff
-      ? 'Wunsch-Unterschied'
-      : 'Wahrnehmungs-Unterschied';
+      ? t('discussTagDesire')
+      : t('discussTagStatus');
+  const secondary = itemSecondary(item);
   return `
     <div class="discuss-item">
       <div class="discuss-item-head">
-        <span class="item-label">${escapeHtml(item.label)}</span>
+        <span class="item-label">${escapeHtml(itemLabel(item))}</span>
         <span class="discuss-tag">${tag}</span>
       </div>
-      ${ITEM_TRANSLATIONS[item.id]
-        ? `<div class="item-translation">${escapeHtml(ITEM_TRANSLATIONS[item.id])}</div>`
-        : ''}
+      ${secondary ? `<div class="item-translation">${escapeHtml(secondary)}</div>` : ''}
       <div class="discuss-compare">
         <div class="discuss-side">
           <div class="discuss-side-name">${escapeHtml(personA.name)}</div>
-          <span class="chip chip--status chip--status-${entryA.status}">${STATUS_LABELS[entryA.status]}</span>
-          <span class="chip chip--desire chip--desire-${entryA.desire}">${DESIRE_LABELS[entryA.desire]}</span>
+          <span class="chip chip--status chip--status-${entryA.status}">${statusLabel(entryA.status)}</span>
+          <span class="chip chip--desire chip--desire-${entryA.desire}">${desireLabel(entryA.desire)}</span>
         </div>
         <div class="discuss-side">
           <div class="discuss-side-name">${escapeHtml(personB.name)}</div>
-          <span class="chip chip--status chip--status-${entryB.status}">${STATUS_LABELS[entryB.status]}</span>
-          <span class="chip chip--desire chip--desire-${entryB.desire}">${DESIRE_LABELS[entryB.desire]}</span>
+          <span class="chip chip--status chip--status-${entryB.status}">${statusLabel(entryB.status)}</span>
+          <span class="chip chip--desire chip--desire-${entryB.desire}">${desireLabel(entryB.desire)}</span>
         </div>
       </div>
     </div>
@@ -545,14 +788,7 @@ function renderMatchView() {
   const body = document.getElementById('match-body');
 
   if (state.people.length < 2) {
-    body.innerHTML = `
-      <p class="hint">
-        Du brauchst mindestens zwei Personen für einen Vergleich. Lege oben
-        eine zweite Person an, oder importiere die exportierte
-        Personen-Datei deiner Partnerin/deines Partners über
-        "Person importieren".
-      </p>
-    `;
+    body.innerHTML = `<p class="hint">${t('matchNeedTwoPeople')}</p>`;
     return;
   }
 
@@ -561,7 +797,7 @@ function renderMatchView() {
   if (!personA || !personB) return;
 
   if (personA.id === personB.id) {
-    body.innerHTML = `<p class="hint">Bitte wähle zwei unterschiedliche Personen aus.</p>`;
+    body.innerHTML = `<p class="hint">${t('matchChooseDifferent')}</p>`;
     return;
   }
 
@@ -570,14 +806,8 @@ function renderMatchView() {
     body.innerHTML = `
       <div class="match-locked">
         <div class="match-locked-icon">🔒</div>
-        <p>
-          Der Vergleich ist noch gesperrt, damit ihr euch beim Ausfüllen
-          nicht gegenseitig beeinflusst.
-        </p>
-        <p>
-          Noch nicht als "fertig" markiert:
-          <strong>${missingDone.map((p) => escapeHtml(p.name)).join(', ')}</strong>.
-        </p>
+        <p>${t('matchLockedText')}</p>
+        <p>${t('matchLockedMissing', { names: missingDone.map((p) => escapeHtml(p.name)).join(', ') })}</p>
       </div>
     `;
     return;
@@ -588,14 +818,14 @@ function renderMatchView() {
 
   let listHtml;
   if (result.comparable === 0) {
-    listHtml = `<p class="hint">Noch keine gemeinsam beantworteten Punkte — füllt zuerst ein paar Elemente auf beiden Boards aus.</p>`;
+    listHtml = `<p class="hint">${t('matchNoComparable')}</p>`;
   } else if (result.discuss.length === 0) {
-    listHtml = `<p class="match-all-good">🎉 Keine Diskrepanzen gefunden — bei allen gemeinsam beantworteten Punkten stimmen Wunsch und Status überein.</p>`;
+    listHtml = `<p class="match-all-good">${t('matchAllGood')}</p>`;
   } else {
     const grouped = new Map();
     result.discuss.forEach((entry) => {
       const category = RA_CATEGORIES.find((c) => c.items.some((i) => i.id === entry.item.id));
-      const key = category ? category.title : '';
+      const key = category ? categoryTitle(category) : '';
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key).push(entry);
     });
@@ -615,12 +845,10 @@ function renderMatchView() {
     <div class="match-summary">
       <div class="big-percent">${percentLabel}</div>
       <div class="match-summary-label">
-        Übereinstimmung zwischen <strong>${escapeHtml(personA.name)}</strong> und
-        <strong>${escapeHtml(personB.name)}</strong>
-        (${result.agree}/${result.comparable} gemeinsam beantworteten Punkten)
+        ${t('matchSummaryLabel', { a: escapeHtml(personA.name), b: escapeHtml(personB.name), agree: result.agree, comparable: result.comparable })}
       </div>
       ${result.discuss.length > 0
-        ? `<div class="mismatch-summary">⚠ ${result.discuss.length} Punkt(e) zu besprechen</div>`
+        ? `<div class="mismatch-summary">${t('matchDiscussSummary', { count: result.discuss.length })}</div>`
         : ''}
     </div>
     <div class="discuss-list">${listHtml}</div>
@@ -637,42 +865,42 @@ function openCategoryPanel(categoryId) {
   if (!category) return;
   const person = getSelectedPerson();
 
-  document.getElementById('panel-title').textContent = category.title;
+  document.getElementById('panel-title').textContent = categoryTitle(category);
   const itemsEl = document.getElementById('panel-items');
   itemsEl.innerHTML = '';
 
   category.items.forEach((item) => {
     const entry = getItemEntry(person, item.id);
+    const label = itemLabel(item);
+    const secondary = itemSecondary(item);
     const row = document.createElement('div');
     row.className = 'item-row';
     row.innerHTML = `
       <div class="item-row-head">
-        <span class="item-label">${escapeHtml(item.label)}</span>
+        <span class="item-label">${escapeHtml(label)}</span>
         <span class="match-indicator" aria-hidden="true"></span>
       </div>
-      ${ITEM_TRANSLATIONS[item.id]
-        ? `<div class="item-translation">${escapeHtml(ITEM_TRANSLATIONS[item.id])}</div>`
-        : ''}
+      ${secondary ? `<div class="item-translation">${escapeHtml(secondary)}</div>` : ''}
       <div class="item-row-control">
-        <span class="control-label">Status</span>
-        <div class="status-group" role="group" aria-label="Status für ${escapeHtml(item.label)}">
-          <button type="button" class="status-btn status-btn--unanswered" data-status="${STATUS.UNANSWERED}">unbeantwortet</button>
-          <button type="button" class="status-btn status-btn--unfulfilled" data-status="${STATUS.UNFULFILLED}">nicht erfüllt</button>
-          <button type="button" class="status-btn status-btn--partial-no" data-status="${STATUS.PARTIAL_NO}">eher nicht</button>
-          <button type="button" class="status-btn status-btn--partial-yes" data-status="${STATUS.PARTIAL_YES}">eher ja</button>
-          <button type="button" class="status-btn status-btn--fulfilled" data-status="${STATUS.FULFILLED}">erfüllt</button>
+        <span class="control-label">${t('controlLabelStatus')}</span>
+        <div class="status-group" role="group" aria-label="${escapeHtml(t('statusGroupAriaLabel', { label }))}">
+          <button type="button" class="status-btn status-btn--unanswered" data-status="${STATUS.UNANSWERED}">${statusLabel(STATUS.UNANSWERED)}</button>
+          <button type="button" class="status-btn status-btn--unfulfilled" data-status="${STATUS.UNFULFILLED}">${statusLabel(STATUS.UNFULFILLED)}</button>
+          <button type="button" class="status-btn status-btn--partial-no" data-status="${STATUS.PARTIAL_NO}">${statusLabel(STATUS.PARTIAL_NO)}</button>
+          <button type="button" class="status-btn status-btn--partial-yes" data-status="${STATUS.PARTIAL_YES}">${statusLabel(STATUS.PARTIAL_YES)}</button>
+          <button type="button" class="status-btn status-btn--fulfilled" data-status="${STATUS.FULFILLED}">${statusLabel(STATUS.FULFILLED)}</button>
         </div>
       </div>
       <div class="item-row-control">
-        <span class="control-label">Wunsch</span>
-        <div class="desire-group" role="group" aria-label="Wunsch für ${escapeHtml(item.label)}">
-          <button type="button" class="desire-btn desire-btn--unanswered" data-desire="${DESIRE.UNANSWERED}">unbeantwortet</button>
-          <button type="button" class="desire-btn desire-btn--unwanted" data-desire="${DESIRE.UNWANTED}">nicht gewünscht</button>
-          <button type="button" class="desire-btn desire-btn--wanted" data-desire="${DESIRE.WANTED}">gewünscht</button>
+        <span class="control-label">${t('controlLabelDesire')}</span>
+        <div class="desire-group" role="group" aria-label="${escapeHtml(t('desireGroupAriaLabel', { label }))}">
+          <button type="button" class="desire-btn desire-btn--unanswered" data-desire="${DESIRE.UNANSWERED}">${desireLabel(DESIRE.UNANSWERED)}</button>
+          <button type="button" class="desire-btn desire-btn--unwanted" data-desire="${DESIRE.UNWANTED}">${desireLabel(DESIRE.UNWANTED)}</button>
+          <button type="button" class="desire-btn desire-btn--wanted" data-desire="${DESIRE.WANTED}">${desireLabel(DESIRE.WANTED)}</button>
         </div>
-        <button type="button" class="note-toggle" aria-label="Notiz für ${escapeHtml(item.label)}">📝</button>
+        <button type="button" class="note-toggle" aria-label="${escapeHtml(t('noteToggleAriaLabel', { label }))}">📝</button>
       </div>
-      <textarea class="item-note hidden" placeholder="Notiz (optional)"></textarea>
+      <textarea class="item-note hidden" placeholder="${escapeHtml(t('notePlaceholder'))}"></textarea>
     `;
 
     const matchIndicator = row.querySelector('.match-indicator');
@@ -683,11 +911,11 @@ function openCategoryPanel(categoryId) {
       if (match === 'match') {
         matchIndicator.classList.add('match-indicator--match');
         matchIndicator.textContent = '✓';
-        matchIndicator.title = 'Passt zusammen: Wunsch und Status stimmen überein';
+        matchIndicator.title = t('matchIndicatorMatchTitle');
       } else if (match === 'mismatch') {
         matchIndicator.classList.add('match-indicator--mismatch');
         matchIndicator.textContent = '⚠';
-        matchIndicator.title = 'Diskrepanz: Wunsch und Status stimmen nicht überein — vielleicht ansprechen?';
+        matchIndicator.title = t('matchIndicatorMismatchTitle');
       } else {
         matchIndicator.textContent = '';
         matchIndicator.title = '';
@@ -777,7 +1005,7 @@ function switchView(view) {
 // ---------------------------------------------------------------------
 
 function addPerson() {
-  const name = prompt('Name der Person:');
+  const name = prompt(t('promptPersonName'));
   if (!name || !name.trim()) return;
   const person = createPerson(name.trim());
   state.people.push(person);
@@ -788,7 +1016,7 @@ function addPerson() {
 
 function renamePerson() {
   const person = getSelectedPerson();
-  const name = prompt('Neuer Name:', person.name);
+  const name = prompt(t('promptNewName'), person.name);
   if (!name || !name.trim()) return;
   person.name = name.trim();
   saveState();
@@ -798,10 +1026,10 @@ function renamePerson() {
 function deletePerson() {
   const person = getSelectedPerson();
   if (state.people.length === 1) {
-    alert('Mindestens eine Person muss vorhanden sein.');
+    alert(t('alertMinOnePerson'));
     return;
   }
-  if (!confirm(`Board für "${person.name}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
+  if (!confirm(t('confirmDeletePerson', { name: person.name }))) return;
   state.people = state.people.filter((p) => p.id !== person.id);
   state.selectedPersonId = state.people[0].id;
   saveState();
@@ -847,7 +1075,7 @@ function importData(file) {
       if (!parsed || !Array.isArray(parsed.people) || parsed.people.length === 0) {
         throw new Error('Ungültiges Format');
       }
-      if (!confirm('Import ersetzt alle aktuellen Daten in dieser App. Fortfahren?')) return;
+      if (!confirm(t('confirmImportAll'))) return;
       parsed.people.forEach((p) => { if (!p.items) p.items = {}; migratePerson(p); });
       if (!parsed.selectedPersonId || !parsed.people.some((p) => p.id === parsed.selectedPersonId)) {
         parsed.selectedPersonId = parsed.people[0].id;
@@ -855,10 +1083,10 @@ function importData(file) {
       state = parsed;
       saveState();
       renderApp();
-      alert('Import erfolgreich.');
+      alert(t('alertImportSuccess'));
     } catch (err) {
       console.error(err);
-      alert('Import fehlgeschlagen: Die Datei ist kein gültiges Backup.');
+      alert(t('alertImportFailure'));
     }
   };
   reader.readAsText(file);
@@ -904,7 +1132,7 @@ function importPersonFile(file) {
       const existingIndex = state.people.findIndex((p) => p.id === person.id);
       if (existingIndex !== -1) {
         const existingName = state.people[existingIndex].name;
-        if (!confirm(`"${existingName}" ist bereits vorhanden. Mit den importierten Daten aktualisieren?`)) return;
+        if (!confirm(t('confirmOverwritePerson', { name: existingName }))) return;
         state.people[existingIndex] = person;
       } else {
         state.people.push(person);
@@ -912,10 +1140,10 @@ function importPersonFile(file) {
       state.selectedPersonId = person.id;
       saveState();
       renderApp();
-      alert(`Person "${person.name}" wurde importiert.`);
+      alert(t('alertPersonImported', { name: person.name }));
     } catch (err) {
       console.error(err);
-      alert('Import fehlgeschlagen: Das ist keine gültige Personen-Datei (nutze "Person teilen" zum Exportieren).');
+      alert(t('alertPersonImportFailure'));
     }
   };
   reader.readAsText(file);
@@ -972,6 +1200,10 @@ function initEventListeners() {
     tab.addEventListener('click', () => switchView(tab.dataset.view));
   });
 
+  document.querySelectorAll('.lang-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+  });
+
   document.getElementById('panel-close').addEventListener('click', closeCategoryPanel);
   document.getElementById('panel-backdrop').addEventListener('click', closeCategoryPanel);
   document.addEventListener('keydown', (e) => {
@@ -995,6 +1227,7 @@ function renderApp() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  applyStaticTranslations();
   initEventListeners();
   renderApp();
 });

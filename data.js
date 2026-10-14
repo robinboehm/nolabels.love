@@ -14,90 +14,90 @@
 
 const RA_CATEGORIES = [
   // ---- Outer ring: broader social / structural themes ----
-  { id: 'financial', ring: 'outer', title: 'Financial', items: [
+  { id: 'financial', ring: 'outer', title: 'Financial', titleDe: 'Finanzen', items: [
     'Money', 'Payments', 'Responsibilities', 'Property', 'Sharing resources', 'Mutual aid', 'Businesses',
   ]},
-  { id: 'power-hierarchy', ring: 'outer', title: 'Power / Hierarchy', items: [
+  { id: 'power-hierarchy', ring: 'outer', title: 'Power / Hierarchy', titleDe: 'Macht / Hierarchie', items: [
     'Boss - employee', 'Sponsor - sponsee', 'Teacher - student', 'Mentor/guide',
   ]},
-  { id: 'companionship', ring: 'outer', title: 'Companionship', items: [
+  { id: 'companionship', ring: 'outer', title: 'Companionship', titleDe: 'Kameradschaft', items: [
     'Playfulness', 'Shared activity / interests', 'Intellectual & philosophical discussions', 'Friendship',
   ]},
-  { id: 'religious-spiritual', ring: 'outer', title: 'Religious / Spiritual', items: [
+  { id: 'religious-spiritual', ring: 'outer', title: 'Religious / Spiritual', titleDe: 'Religion/Spiritualität', items: [
     'Shared ritual / prayer', 'Shared beliefs', 'Discussions', 'Ceremony', 'Traditions', 'Magic', 'Divination',
   ]},
-  { id: 'future-plans', ring: 'outer', title: 'Future Plans', items: [
+  { id: 'future-plans', ring: 'outer', title: 'Future Plans', titleDe: 'Pläne für die Zukunft', items: [
     'Relationship duration', 'Children', 'Community', 'Living preferences', 'Career importance',
   ]},
-  { id: 'labels-terms', ring: 'outer', title: 'Labels/Terms', items: [
+  { id: 'labels-terms', ring: 'outer', title: 'Labels/Terms', titleDe: 'Bezeichnungen/Begriffe', items: [
     'Spouses', 'Parent', 'Cousin', 'Sibling', 'Datemate', 'Chosen family', 'Social media official', 'Terms of affection',
   ]},
-  { id: 'marginalization', ring: 'outer', title: 'Marginalization, Privilege, Allyship, & Advocacy', items: [
+  { id: 'marginalization', ring: 'outer', title: 'Marginalization, Privilege, Allyship, & Advocacy', titleDe: 'Marginalisierung, Privilegien, Verbündete und Fürsprache', items: [
     'Race', 'Disability', 'Gender', 'Class', 'Citizenship', 'Sexuality', 'Size', 'Beauty', 'Religion', 'Neurodivergence',
   ]},
-  { id: 'legal', ring: 'outer', title: 'Legal', items: [
+  { id: 'legal', ring: 'outer', title: 'Legal', titleDe: 'Rechtsthemen', items: [
     'Power of attorney', 'Business partner', 'Adoption', 'Marriage', 'Executor of will', 'Civil partnership',
   ]},
-  { id: 'pda', ring: 'outer', title: 'Public Displays of Affection', items: [
+  { id: 'pda', ring: 'outer', title: 'Public Displays of Affection', titleDe: 'Öffentliche Anzeigen der Zuneigung', items: [
     'Events', 'Friends', 'Family', 'Work', 'Social media', 'Seen together', 'Outness',
   ]},
-  { id: 'partnership', ring: 'outer', title: 'Partnership', items: [
+  { id: 'partnership', ring: 'outer', title: 'Partnership', titleDe: 'Partnerschaft', items: [
     'Shared goals / values', 'Routine', 'Embracing change', 'Consistency', 'Commitment', 'Reliability',
   ]},
-  { id: 'collaborative', ring: 'outer', title: 'Collaborative', items: [
+  { id: 'collaborative', ring: 'outer', title: 'Collaborative', titleDe: 'Zusammenarbeit', items: [
     'Working together', 'Teaching', 'Projects', 'Organizations', 'Associations',
   ]},
-  { id: 'exclusivity', ring: 'outer', title: 'Exclusivity', items: [
+  { id: 'exclusivity', ring: 'outer', title: 'Exclusivity', titleDe: 'Exklusivität', items: [
     'Sexual', 'Emotional', 'Social', 'Structural', 'Romantic', 'Specific activities',
   ]},
-  { id: 'professional-work', ring: 'outer', title: 'Professional/Work', items: [
+  { id: 'professional-work', ring: 'outer', title: 'Professional/Work', titleDe: 'Beruf/Arbeit', items: [
     'Combining social, collaborative, & financial', 'Colleagues', 'Partners', 'Co-operatives',
   ]},
 
   // ---- Inner ring: more personal / intimate themes ----
-  { id: 'technology', ring: 'inner', title: 'Technology', items: [
+  { id: 'technology', ring: 'inner', title: 'Technology', titleDe: 'Technologie', items: [
     'Sharing accounts / licenses', 'Shared tools / consoles', 'Passwords',
   ]},
-  { id: 'communication-methods', ring: 'inner', title: 'Communication Methods', items: [
+  { id: 'communication-methods', ring: 'inner', title: 'Communication Methods', titleDe: 'Methoden der Kommunikation', items: [
     'Video', 'Phone', 'Text', 'Sexting', 'Written', 'In-person visits', 'Relationship meetings',
   ]},
-  { id: 'communication-frequency', ring: 'inner', title: 'Communication Frequency', items: [
+  { id: 'communication-frequency', ring: 'inner', title: 'Communication Frequency', titleDe: 'Häufigkeit der Kommunikation', items: [
     'Daily', 'Weekly', 'Monthly', 'Annually', 'Inconsistently', 'Check-ins', 'Emergencies',
   ]},
-  { id: 'domestic', ring: 'inner', title: 'Domestic', items: [
+  { id: 'domestic', ring: 'inner', title: 'Domestic', titleDe: 'Häuslichkeit', items: [
     'Routines', 'Chores', 'Sharing a dwelling/home', 'Sharing a sleeping space', 'Cooking together', 'Sharing meals',
   ]},
-  { id: 'power-exchange-kink', ring: 'inner', title: 'Power Exchange & Kink', items: [
+  { id: 'power-exchange-kink', ring: 'inner', title: 'Power Exchange & Kink', titleDe: 'Austausch von Macht & Kink', items: [
     'Roleplay', 'Bondage', 'Fetishes', 'Sadomasochism', 'Sensation', 'Dominance & submission', 'Switching',
   ]},
-  { id: 'time-together', ring: 'inner', title: 'Time Spent Together', items: [
+  { id: 'time-together', ring: 'inner', title: 'Time Spent Together', titleDe: 'Gemeinsame Zeit', items: [
     'Holidays', 'Birthdays', 'Anniversaries', 'Errands', 'Parallel play', 'Frequency', 'Dates', 'Home', 'Duration',
   ]},
-  { id: 'co-caregivers', ring: 'inner', title: 'Co-Caregivers', items: [
+  { id: 'co-caregivers', ring: 'inner', title: 'Co-Caregivers', titleDe: 'Mitbetreuer', items: [
     'Family (sick, elderly)', 'Long-term commitment', 'Animals', 'Plants', 'Children',
   ]},
-  { id: 'caregiving', ring: 'inner', title: 'Caregiving', items: [
+  { id: 'caregiving', ring: 'inner', title: 'Caregiving', titleDe: 'Pflege', items: [
     'Health', 'Sponsorship', 'Reliability', 'Emergencies', 'End of life / death', 'Receiving / giving care', 'Disability',
   ]},
-  { id: 'emotional-support', ring: 'inner', title: 'Emotional Support', items: [
+  { id: 'emotional-support', ring: 'inner', title: 'Emotional Support', titleDe: 'Emotionale Unterstützung', items: [
     'Listening', 'Empathy', 'Insecurities & reassurances', 'Being asked for advice', 'Confidante',
   ]},
-  { id: 'emotional-intimacy', ring: 'inner', title: 'Emotional Intimacy', items: [
+  { id: 'emotional-intimacy', ring: 'inner', title: 'Emotional Intimacy', titleDe: 'Emotionale Intimität', items: [
     'Being vulnerable', 'Discussing values / beliefs', 'Difficult conversations', 'Love languages',
   ]},
-  { id: 'physical-intimacy', ring: 'inner', title: 'Physical Intimacy', items: [
+  { id: 'physical-intimacy', ring: 'inner', title: 'Physical Intimacy', titleDe: 'Körperliche Intimität', items: [
     'Dance', 'Cuddles', 'Hugs', 'Pets', 'Massage', 'Hand-holding', 'Nudity', 'Kissing', 'Co-sleeping', 'Body contact',
   ]},
-  { id: 'sexual', ring: 'inner', title: 'Sexual', items: [
+  { id: 'sexual', ring: 'inner', title: 'Sexual', titleDe: 'Sexuelle Intimität', items: [
     'Orgasms', 'Frequency', 'Involving genitals / anus', 'Touch', 'Voice', 'Text', 'STI testing & frequency', 'Safer sex practices',
   ]},
-  { id: 'romantic', ring: 'inner', title: 'Romantic', items: [
+  { id: 'romantic', ring: 'inner', title: 'Romantic', titleDe: 'Romantik', items: [
     'Emotional attraction', 'Cultivating uniqueness', 'Unmotivated euphoria', 'Shared experiences', 'Intense focus', 'Crushes',
   ]},
-  { id: 'creative', ring: 'inner', title: 'Creative', items: [
+  { id: 'creative', ring: 'inner', title: 'Creative', titleDe: 'Kreativität', items: [
     'Visual art', 'Craft', 'Critique', 'Music', 'Yoga', 'Comedy', 'Acrobatics', 'Dance', 'Theatre', 'Improv', 'Martial arts',
   ]},
-  { id: 'things-to-discuss', ring: 'inner', title: 'Things to Discuss', items: [
+  { id: 'things-to-discuss', ring: 'inner', title: 'Things to Discuss', titleDe: 'Zu besprechende Themen', items: [
     'Important boundaries', 'Mental health & trauma', 'Hard conversations', 'Security & privacy', 'Accountability',
   ]},
 ];
@@ -362,3 +362,94 @@ const ITEM_TRANSLATIONS = {
   'things-to-discuss__security-privacy': 'Sicherheit & Privatsphäre',
   'things-to-discuss__accountability': 'Verantwortungsübernahme/Rechenschaft',
 };
+
+/**
+ * Short, label-sized German term for items whose full ITEM_TRANSLATIONS
+ * entry is a longer explanatory phrase/sentence rather than a short noun
+ * phrase — used as the primary item label when the UI is switched to
+ * German, so it reads like the original board's terms instead of a full
+ * description. Items not listed here fall back to the part of their
+ * ITEM_TRANSLATIONS entry before the first " – ", or the full entry if it
+ * has no " – " separator (see germanLabelFor below).
+ */
+const ITEM_LABEL_DE_OVERRIDES = {
+  'power-hierarchy__boss-employee': 'Chef*in – Angestellte*r',
+  'power-hierarchy__sponsor-sponsee': 'Sponsor*in – Schützling',
+  'power-hierarchy__teacher-student': 'Lehrer*in – Schüler*in',
+  'religious-spiritual__discussions': 'Erörterungen',
+  'future-plans__career-importance': 'Stellenwert der Karriere',
+  'labels-terms__social-media-official': 'Offiziell in sozialen Medien',
+  'labels-terms__terms-of-affection': 'Kosenamen',
+  'marginalization__race': 'Ethnische Herkunft',
+  'marginalization__size': 'Körpergröße/-form',
+  'pda__events': 'Veranstaltungen',
+  'pda__friends': 'Freund*innen',
+  'pda__family': 'Familie',
+  'pda__work': 'Arbeitsplatz',
+  'pda__social-media': 'Soziale Medien',
+  'pda__seen-together': 'Zusammen gesehen werden',
+  'partnership__routine': 'Routine',
+  'partnership__embracing-change': 'Veränderungen annehmen',
+  'collaborative__teaching': 'Unterricht',
+  'collaborative__projects': 'Projekte',
+  'collaborative__organizations': 'Organisationen',
+  'collaborative__associations': 'Verbände',
+  'exclusivity__sexual': 'Sexuell',
+  'exclusivity__emotional': 'Emotional',
+  'exclusivity__social': 'Sozial',
+  'exclusivity__structural': 'Strukturell',
+  'exclusivity__romantic': 'Romantisch',
+  'exclusivity__specific-activities': 'Spezifische Aktivitäten',
+  'professional-work__combining-social-collaborative-financial': 'Soziales, Kollaboratives & Finanzielles verbinden',
+  'professional-work__co-operatives': 'Genossenschaften',
+  'technology__shared-tools-consoles': 'Geräte/Konsolen',
+  'technology__passwords': 'Passwörter',
+  'communication-frequency__check-ins': 'Check-ins',
+  'communication-frequency__emergencies': 'Notfälle',
+  'domestic__sharing-a-sleeping-space': 'Schlafplatz teilen',
+  'time-together__holidays': 'Feiertage',
+  'time-together__birthdays': 'Geburtstage',
+  'time-together__anniversaries': 'Jahrestage',
+  'time-together__errands': 'Besorgungen',
+  'time-together__frequency': 'Häufigkeit',
+  'time-together__home': 'Zuhause',
+  'time-together__duration': 'Dauer',
+  'co-caregivers__long-term-commitment': 'Langfristiges Engagement',
+  'co-caregivers__animals': 'Tiere',
+  'co-caregivers__plants': 'Pflanzen',
+  'co-caregivers__children': 'Kinder',
+  'caregiving__reliability': 'Verlässlichkeit',
+  'caregiving__emergencies': 'Notfälle',
+  'caregiving__disability': 'Behinderung',
+  'emotional-support__insecurities-reassurances': 'Unsicherheiten & Bestärkung',
+  'emotional-intimacy__being-vulnerable': 'Verletzlich sein',
+  'emotional-intimacy__discussing-values-beliefs': 'Werte/Überzeugungen besprechen',
+  'emotional-intimacy__difficult-conversations': 'Schwierige Gespräche',
+  'physical-intimacy__co-sleeping': 'Zusammen schlafen',
+  'physical-intimacy__body-contact': 'Körperkontakt',
+  'sexual__frequency': 'Häufigkeit',
+  'sexual__voice': 'Stimme',
+  'sexual__text': 'Text',
+  'sexual__sti-testing-frequency': 'STI-Tests & Häufigkeit',
+  'romantic__cultivating-uniqueness': 'Einzigartigkeit pflegen',
+  'romantic__intense-focus': 'Intensive Aufmerksamkeit',
+  'creative__critique': 'Kritik',
+  'things-to-discuss__accountability': 'Verantwortlichkeit',
+};
+
+/** Derives the short German item label described above for one item id. */
+function germanLabelFor(itemId, englishLabel) {
+  if (ITEM_LABEL_DE_OVERRIDES[itemId]) return ITEM_LABEL_DE_OVERRIDES[itemId];
+  const translation = ITEM_TRANSLATIONS[itemId];
+  if (!translation) return englishLabel;
+  const dashIndex = translation.indexOf(' – ');
+  return dashIndex === -1 ? translation : translation.slice(0, dashIndex);
+}
+
+// Attach the German label to every item now that ITEM_TRANSLATIONS (and the
+// overrides above) are available.
+RA_CATEGORIES.forEach((category) => {
+  category.items.forEach((item) => {
+    item.labelDe = germanLabelFor(item.id, item.label);
+  });
+});

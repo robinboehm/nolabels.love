@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Relationship Anarchy Smörgåsbord — Board</title>
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body>
 
@@ -13,53 +13,58 @@
     <h1 class="app-title">RA Smörgåsbord</h1>
 
     <div class="person-controls">
-      <label for="person-select" class="sr-only">Person</label>
+      <label for="person-select" class="sr-only" data-i18n="personSrLabel">Person</label>
       <select id="person-select"></select>
-      <button id="btn-add-person" class="btn btn-icon" title="Person hinzufügen">＋</button>
-      <button id="btn-rename-person" class="btn btn-icon" title="Person umbenennen">✎</button>
-      <button id="btn-delete-person" class="btn btn-icon" title="Person löschen">🗑</button>
-      <button id="btn-toggle-done" class="btn" title="Markiert diese Person als fertig mit dem Ausfüllen, damit sie im Match-Vergleich berücksichtigt wird">Als fertig markieren</button>
+      <button id="btn-add-person" class="btn btn-icon" data-i18n-title="btnAddPersonTitle" title="Person hinzufügen">＋</button>
+      <button id="btn-rename-person" class="btn btn-icon" data-i18n-title="btnRenamePersonTitle" title="Person umbenennen">✎</button>
+      <button id="btn-delete-person" class="btn btn-icon" data-i18n-title="btnDeletePersonTitle" title="Person löschen">🗑</button>
+      <button id="btn-toggle-done" class="btn" data-i18n-title="btnToggleDoneTitle" title="Markiert diese Person als fertig mit dem Ausfüllen, damit sie im Match-Vergleich berücksichtigt wird">Als fertig markieren</button>
     </div>
 
     <div class="data-controls">
-      <button id="btn-export-person" class="btn" title="Nur die aktuell ausgewählte Person als Datei exportieren, zum Teilen mit der Partnerin/dem Partner">Person teilen</button>
-      <button id="btn-import-person" class="btn" title="Eine geteilte Person-Datei importieren, ohne die anderen Personen zu überschreiben">Person importieren</button>
+      <button id="btn-export-person" class="btn" data-i18n="btnExportPersonLabel" data-i18n-title="btnExportPersonTitle" title="Nur die aktuell ausgewählte Person als Datei exportieren, zum Teilen mit der Partnerin/dem Partner">Person teilen</button>
+      <button id="btn-import-person" class="btn" data-i18n="btnImportPersonLabel" data-i18n-title="btnImportPersonTitle" title="Eine geteilte Person-Datei importieren, ohne die anderen Personen zu überschreiben">Person importieren</button>
       <input type="file" id="file-import-person" accept="application/json" class="sr-only" />
-      <button id="btn-export" class="btn" title="Alle Personen als vollständiges Backup exportieren">Alles exportieren</button>
-      <button id="btn-import" class="btn" title="Vollständiges Backup laden (ersetzt alle aktuellen Daten)">Alles importieren</button>
+      <button id="btn-export" class="btn" data-i18n="btnExportLabel" data-i18n-title="btnExportTitle" title="Alle Personen als vollständiges Backup exportieren">Alles exportieren</button>
+      <button id="btn-import" class="btn" data-i18n="btnImportLabel" data-i18n-title="btnImportTitle" title="Vollständiges Backup laden (ersetzt alle aktuellen Daten)">Alles importieren</button>
       <input type="file" id="file-import" accept="application/json" class="sr-only" />
+    </div>
+
+    <div class="lang-toggle" role="group" data-i18n-aria-label="langToggleAriaLabel" aria-label="Sprache">
+      <button type="button" class="lang-btn" data-lang="de">DE</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
     </div>
   </div>
 
   <div class="topbar-row">
-    <nav class="tabs" role="tablist" aria-label="Ansicht">
-      <button class="tab active" data-view="board" role="tab" aria-selected="true">Board</button>
-      <button class="tab" data-view="overview" role="tab" aria-selected="false">Übersicht</button>
-      <button class="tab" data-view="match" role="tab" aria-selected="false">Match</button>
+    <nav class="tabs" role="tablist" data-i18n-aria-label="tabsAriaLabel" aria-label="Ansicht">
+      <button class="tab active" data-view="board" role="tab" aria-selected="true" data-i18n="tabBoard">Board</button>
+      <button class="tab" data-view="overview" role="tab" aria-selected="false" data-i18n="tabOverview">Übersicht</button>
+      <button class="tab" data-view="match" role="tab" aria-selected="false" data-i18n="tabMatch">Match</button>
     </nav>
 
     <div class="legend">
-      <span class="legend-item"><span class="swatch swatch--fulfilled"></span> erfüllt</span>
-      <span class="legend-item"><span class="swatch swatch--partial"></span> teilweise</span>
-      <span class="legend-item"><span class="swatch swatch--unfulfilled"></span> nicht erfüllt</span>
-      <span class="legend-item"><span class="swatch swatch--unanswered"></span> unbeantwortet</span>
+      <span class="legend-item"><span class="swatch swatch--fulfilled"></span> <span data-i18n="legendFulfilled">erfüllt</span></span>
+      <span class="legend-item"><span class="swatch swatch--partial"></span> <span data-i18n="legendPartial">teilweise</span></span>
+      <span class="legend-item"><span class="swatch swatch--unfulfilled"></span> <span data-i18n="legendUnfulfilled">nicht erfüllt</span></span>
+      <span class="legend-item"><span class="swatch swatch--unanswered"></span> <span data-i18n="legendUnanswered">unbeantwortet</span></span>
     </div>
   </div>
 
   <div class="topbar-row">
     <div class="legend legend--align">
-      <span class="legend-label">Übereinstimmung (Hub-Außenring):</span>
-      <span class="legend-item"><span class="swatch swatch--align-good"></span> passt zusammen</span>
-      <span class="legend-item"><span class="swatch swatch--align-partial"></span> teilweise</span>
-      <span class="legend-item"><span class="swatch swatch--align-bad"></span> Diskrepanz</span>
-      <span class="legend-item"><span class="swatch swatch--align-unrated"></span> unbewertet</span>
+      <span class="legend-label" data-i18n="legendAlignLabel">Übereinstimmung (Hub-Außenring):</span>
+      <span class="legend-item"><span class="swatch swatch--align-good"></span> <span data-i18n="legendAlignGood">passt zusammen</span></span>
+      <span class="legend-item"><span class="swatch swatch--align-partial"></span> <span data-i18n="legendAlignPartial">teilweise</span></span>
+      <span class="legend-item"><span class="swatch swatch--align-bad"></span> <span data-i18n="legendAlignBad">Diskrepanz</span></span>
+      <span class="legend-item"><span class="swatch swatch--align-unrated"></span> <span data-i18n="legendAlignUnrated">unbewertet</span></span>
     </div>
   </div>
 </header>
 
 <main>
   <section id="view-board" class="view">
-    <p class="hint">
+    <p class="hint" data-i18n-html="boardHint">
       Klicke auf eine Kategorie, um die Elemente zu bewerten. Die Kategorien
       sind lose sortiert: außen eher gesellschaftlich/strukturell, innen eher
       persönlich/intim — ganz wie im Original-Smörgåsbord. Pro Element gibst
@@ -87,7 +92,7 @@
   </section>
 
   <section id="view-match" class="view hidden">
-    <p class="hint">
+    <p class="hint" data-i18n-html="matchHint">
       Vergleiche die Boards von zwei Personen, die unabhängig voneinander für
       dieselbe Beziehung ausgefüllt haben (z.&nbsp;B. "Ich" und "Alex"). Fülle
       dazu jeweils ein eigenes Personen-Profil aus, markiere es oben als
@@ -98,12 +103,12 @@
     </p>
     <div class="match-controls">
       <label class="match-select-label">
-        Person A
+        <span data-i18n="matchLabelA">Person A</span>
         <select id="match-select-a"></select>
       </label>
       <span class="match-vs">↔</span>
       <label class="match-select-label">
-        Person B
+        <span data-i18n="matchLabelB">Person B</span>
         <select id="match-select-b"></select>
       </label>
     </div>
@@ -113,13 +118,13 @@
 
 <div class="panel-backdrop" id="panel-backdrop"></div>
 <aside class="panel" id="panel" aria-hidden="true">
-  <button class="panel-close" id="panel-close" aria-label="Schließen">✕</button>
+  <button class="panel-close" id="panel-close" data-i18n-aria-label="panelCloseAriaLabel" aria-label="Schließen">✕</button>
   <h2 id="panel-title"></h2>
   <div id="panel-items"></div>
 </aside>
 
 <footer class="app-footer">
-  <p>
+  <p data-i18n-html="footerText">
     Inhalte basieren auf dem
     <strong>Relationship Anarchy Smörgåsbord (v6)</strong> von Lyrica Lawrence
     &amp; Heather Orr, aktualisiert von Maxx Hill — lizenziert unter
@@ -129,7 +134,7 @@
   </p>
 </footer>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=2"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>
