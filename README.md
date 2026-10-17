@@ -105,3 +105,10 @@ Grafik-Tool wartbar ist.
 
 Kategorien und Items stammen aus dem Relationship Anarchy Smörgåsbord (v6),
 lizenziert unter [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+## Ressourcen-Sammlung
+
+In [`RESOURCES.md`](./RESOURCES.md) sammeln wir Links zu Artikeln, Guides
+und Tools rund um offene Beziehungen, Polyamorie und Relationship Anarchy —
+als Grundlage, um das Projekt perspektivisch über das Board hinaus zu einer
+breiteren Ressourcen-Sammlung auszubauen.
