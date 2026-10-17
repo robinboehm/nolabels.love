@@ -1,0 +1,99 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Term {
+  term: string;
+  definition: string;
+}
+
+// A first, deliberately small set of terms — accurate over exhaustive.
+// Sorted alphabetically; extend this list over time.
+const terms: Term[] = [
+  {
+    term: "Compersion",
+    definition:
+      "Die Freude darüber, dass die eigene Partnerin/der eigene Partner mit einer anderen Person eine erfüllende Zeit oder Beziehung erlebt — oft als Gegenstück zu Eifersucht beschrieben, auch wenn beide Gefühle gleichzeitig auftreten können.",
+  },
+  {
+    term: "Einvernehmliche Non-Monogamie (ENM)",
+    definition:
+      "Oberbegriff für Beziehungsmodelle, in denen mehr als eine romantische und/oder sexuelle Verbindung gleichzeitig besteht — mit dem Wissen und Einverständnis aller Beteiligten. Polyamorie, offene Beziehungen und Relationship Anarchy fallen alle darunter.",
+  },
+  {
+    term: "Hierarchische Polyamorie",
+    definition:
+      "Ein Polyamorie-Modell mit erkennbarer Rangfolge zwischen Beziehungen, z. B. eine „primäre“ Partnerschaft (oft mit gemeinsamem Haushalt, Finanzen oder Kindern) und „sekundäre“ Beziehungen daneben. Steht im Kontrast zu nicht-hierarchischen Modellen wie Kitchen-Table- oder Relationship-Anarchy-Ansätzen.",
+  },
+  {
+    term: "Kitchen-Table Polyamory",
+    definition:
+      "Ein Polyamorie-Stil, bei dem alle beteiligten Personen (einschließlich Metamours) idealerweise entspannt miteinander auskommen und sich vorstellen können, gemeinsam am Küchentisch zu sitzen — im Gegensatz zu Parallel Polyamory, wo die Beziehungen bewusst getrennt bleiben.",
+  },
+  {
+    term: "Metamour",
+    definition:
+      "Die Partnerin/der Partner deiner Partnerin bzw. deines Partners, zu der/dem du selbst nicht in einer romantischen oder sexuellen Beziehung stehst.",
+  },
+  {
+    term: "Mono-Poly-Beziehung",
+    definition:
+      "Eine Beziehung, in der eine Person monogam leben möchte und die andere polyamor — meist durch explizite Absprachen darüber, was das für beide Seiten bedeutet und welche Bedürfnisse auf welchem Weg erfüllt werden.",
+  },
+  {
+    term: "New Relationship Energy (NRE)",
+    definition:
+      "Die intensive Aufregung, Verliebtheit und gesteigerte Aufmerksamkeit zu Beginn einer neuen Beziehung. In nicht-monogamen Kontexten oft explizit benannt, weil sie bestehende Beziehungen vorübergehend beeinflussen kann.",
+  },
+  {
+    term: "Parallel Polyamory",
+    definition:
+      "Ein Polyamorie-Stil, bei dem die verschiedenen Beziehungen weitgehend getrennt nebeneinander existieren, ohne dass sich die beteiligten Personen zwangsläufig kennenlernen oder Kontakt pflegen müssen.",
+  },
+  {
+    term: "Polyamorie",
+    definition:
+      "Die Praxis oder das Begehren, mehrere romantische Beziehungen gleichzeitig zu führen — mit dem Wissen und Einverständnis aller Beteiligten. Die konkrete Form (Hierarchie, Wohnsituation, Regeln) variiert stark von Mensch zu Mensch.",
+  },
+  {
+    term: "Relationship Anarchy",
+    definition:
+      "Ein Ansatz, der jede Beziehung individuell gestaltet, statt vorgegebenen Kategorien (Partner*in, beste Freund*in, …) automatisch bestimmte Rechte, Pflichten oder Prioritäten zuzuschreiben. Lehnt insbesondere die „Relationship Escalator“-Norm ab und betont Communitys sowie gegenseitige Unterstützung (Mutual Aid) als zentrale Stützen.",
+  },
+  {
+    term: "Relationship Escalator",
+    definition:
+      "Die gesellschaftlich erwartete Abfolge, der romantische Beziehungen angeblich folgen sollen: Dating → Exklusivität → Zusammenziehen → Heirat → Kinder. Der Begriff wird meist kritisch verwendet, um zu hinterfragen, wessen Interessen dieser Standardpfad eigentlich bedient.",
+  },
+  {
+    term: "Solo-Polyamorie",
+    definition:
+      "Ein Ansatz innerhalb der Polyamorie, bei dem eine Person sich selbst als primären Bezugspunkt versteht — oft ohne den Wunsch nach gemeinsamem Haushalt, verschmolzenen Finanzen oder einer Beziehung, die formal über allen anderen steht.",
+  },
+];
+---
+
+<BaseLayout
+  title="Glossar"
+  description="Begriffe rund um Non-Monogamie, Polyamorie und Relationship Anarchy — verständlich erklärt."
+>
+  <section class="mx-auto max-w-3xl px-5 pb-20 pt-16 sm:px-8 sm:pt-20">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">Glossar</p>
+    <h1 class="mt-4 font-display text-4xl font-medium text-[var(--color-ink)] sm:text-5xl">Begriffe erklärt</h1>
+    <p class="mt-5 text-lg leading-relaxed text-[var(--color-ink-soft)]">
+      Ein erster, bewusst kleiner Satz an Begriffen rund um Non-Monogamie,
+      Polyamorie und Relationship Anarchy — Genauigkeit vor Vollständigkeit.
+      Wird laufend erweitert.
+    </p>
+
+    <dl class="mt-12 flex flex-col divide-y divide-[var(--color-line)]">
+      {
+        terms.map((entry) => (
+          <div id={entry.term.toLowerCase().replace(/[^a-z0-9]+/g, "-")} class="scroll-mt-24 py-6">
+            <dt class="font-display text-xl font-medium text-[var(--color-ink)]">{entry.term}</dt>
+            <dd class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">{entry.definition}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</BaseLayout>

@@ -1,0 +1,53 @@
+/* Fraunces (display serif, warm & characterful) + Work Sans (humanist body) */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/*
+ * Design tokens for nolabels.love.
+ *
+ * A dusky, warm palette (not the templated cream+terracotta or
+ * black+neon look) — deep aubergine ink on warm linen, with a muted
+ * brick-rose primary and sage secondary nodding to "a spectrum, not a
+ * box". Fraunces carries the voice in headings; Work Sans stays quiet
+ * and legible everywhere else.
+ */
+@theme {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #f8f1ec;
+  --color-bg-soft: #f1e6de;
+  --color-ink: #241a2c;
+  --color-ink-soft: #4a3c4f;
+  --color-muted: #7d6f78;
+  --color-primary: #a23e54;
+  --color-primary-dark: #7f2f42;
+  --color-secondary: #51624f;
+  --color-secondary-soft: #c9d2bf;
+  --color-accent: #d7a444;
+  --color-line: #e3d4ca;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* Respect reduced-motion for the drifting hero circles (see Header/Hero). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

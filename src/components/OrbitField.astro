@@ -1,0 +1,39 @@
+---
+/**
+ * Signature decorative element: soft, overlapping, asymmetric circles —
+ * standing in for relationships that overlap and intertwine rather than
+ * nesting into one fixed hierarchy. Pure CSS, no JS; a very slow drift
+ * animation that `prefers-reduced-motion` (see global.css) freezes.
+ */
+---
+
+<div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <div class="orbit-shape absolute -left-16 top-6 h-72 w-72 rounded-full bg-[var(--color-primary)]/25 blur-2xl"></div>
+  <div class="orbit-shape orbit-shape--slow absolute left-40 top-28 h-56 w-56 rounded-full bg-[var(--color-accent)]/30 blur-2xl"></div>
+  <div class="orbit-shape orbit-shape--reverse absolute right-10 -top-10 h-80 w-80 rounded-full bg-[var(--color-secondary)]/20 blur-2xl"></div>
+  <div class="orbit-shape absolute right-1/3 top-44 h-40 w-40 rounded-full bg-[var(--color-primary)]/15 blur-xl"></div>
+</div>
+
+<style>
+  .orbit-shape {
+    animation: orbit-drift 22s ease-in-out infinite;
+  }
+  .orbit-shape--slow {
+    animation-duration: 30s;
+    animation-delay: -6s;
+  }
+  .orbit-shape--reverse {
+    animation-direction: reverse;
+    animation-duration: 26s;
+    animation-delay: -12s;
+  }
+
+  @keyframes orbit-drift {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(1.5rem, -1rem) scale(1.05);
+    }
+  }
+</style>
