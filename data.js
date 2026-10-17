@@ -363,93 +363,14 @@ const ITEM_TRANSLATIONS = {
   'things-to-discuss__accountability': 'Verantwortungsübernahme/Rechenschaft',
 };
 
-/**
- * Short, label-sized German term for items whose full ITEM_TRANSLATIONS
- * entry is a longer explanatory phrase/sentence rather than a short noun
- * phrase — used as the primary item label when the UI is switched to
- * German, so it reads like the original board's terms instead of a full
- * description. Items not listed here fall back to the part of their
- * ITEM_TRANSLATIONS entry before the first " – ", or the full entry if it
- * has no " – " separator (see germanLabelFor below).
- */
-const ITEM_LABEL_DE_OVERRIDES = {
-  'power-hierarchy__boss-employee': 'Chef*in – Angestellte*r',
-  'power-hierarchy__sponsor-sponsee': 'Sponsor*in – Schützling',
-  'power-hierarchy__teacher-student': 'Lehrer*in – Schüler*in',
-  'religious-spiritual__discussions': 'Erörterungen',
-  'future-plans__career-importance': 'Stellenwert der Karriere',
-  'labels-terms__social-media-official': 'Offiziell in sozialen Medien',
-  'labels-terms__terms-of-affection': 'Kosenamen',
-  'marginalization__race': 'Ethnische Herkunft',
-  'marginalization__size': 'Körpergröße/-form',
-  'pda__events': 'Veranstaltungen',
-  'pda__friends': 'Freund*innen',
-  'pda__family': 'Familie',
-  'pda__work': 'Arbeitsplatz',
-  'pda__social-media': 'Soziale Medien',
-  'pda__seen-together': 'Zusammen gesehen werden',
-  'partnership__routine': 'Routine',
-  'partnership__embracing-change': 'Veränderungen annehmen',
-  'collaborative__teaching': 'Unterricht',
-  'collaborative__projects': 'Projekte',
-  'collaborative__organizations': 'Organisationen',
-  'collaborative__associations': 'Verbände',
-  'exclusivity__sexual': 'Sexuell',
-  'exclusivity__emotional': 'Emotional',
-  'exclusivity__social': 'Sozial',
-  'exclusivity__structural': 'Strukturell',
-  'exclusivity__romantic': 'Romantisch',
-  'exclusivity__specific-activities': 'Spezifische Aktivitäten',
-  'professional-work__combining-social-collaborative-financial': 'Soziales, Kollaboratives & Finanzielles verbinden',
-  'professional-work__co-operatives': 'Genossenschaften',
-  'technology__shared-tools-consoles': 'Geräte/Konsolen',
-  'technology__passwords': 'Passwörter',
-  'communication-frequency__check-ins': 'Check-ins',
-  'communication-frequency__emergencies': 'Notfälle',
-  'domestic__sharing-a-sleeping-space': 'Schlafplatz teilen',
-  'time-together__holidays': 'Feiertage',
-  'time-together__birthdays': 'Geburtstage',
-  'time-together__anniversaries': 'Jahrestage',
-  'time-together__errands': 'Besorgungen',
-  'time-together__frequency': 'Häufigkeit',
-  'time-together__home': 'Zuhause',
-  'time-together__duration': 'Dauer',
-  'co-caregivers__long-term-commitment': 'Langfristiges Engagement',
-  'co-caregivers__animals': 'Tiere',
-  'co-caregivers__plants': 'Pflanzen',
-  'co-caregivers__children': 'Kinder',
-  'caregiving__reliability': 'Verlässlichkeit',
-  'caregiving__emergencies': 'Notfälle',
-  'caregiving__disability': 'Behinderung',
-  'emotional-support__insecurities-reassurances': 'Unsicherheiten & Bestärkung',
-  'emotional-intimacy__being-vulnerable': 'Verletzlich sein',
-  'emotional-intimacy__discussing-values-beliefs': 'Werte/Überzeugungen besprechen',
-  'emotional-intimacy__difficult-conversations': 'Schwierige Gespräche',
-  'physical-intimacy__co-sleeping': 'Zusammen schlafen',
-  'physical-intimacy__body-contact': 'Körperkontakt',
-  'sexual__frequency': 'Häufigkeit',
-  'sexual__voice': 'Stimme',
-  'sexual__text': 'Text',
-  'sexual__sti-testing-frequency': 'STI-Tests & Häufigkeit',
-  'romantic__cultivating-uniqueness': 'Einzigartigkeit pflegen',
-  'romantic__intense-focus': 'Intensive Aufmerksamkeit',
-  'creative__critique': 'Kritik',
-  'things-to-discuss__accountability': 'Verantwortlichkeit',
-};
-
-/** Derives the short German item label described above for one item id. */
-function germanLabelFor(itemId, englishLabel) {
-  if (ITEM_LABEL_DE_OVERRIDES[itemId]) return ITEM_LABEL_DE_OVERRIDES[itemId];
-  const translation = ITEM_TRANSLATIONS[itemId];
-  if (!translation) return englishLabel;
-  const dashIndex = translation.indexOf(' – ');
-  return dashIndex === -1 ? translation : translation.slice(0, dashIndex);
-}
-
-// Attach the German label to every item now that ITEM_TRANSLATIONS (and the
-// overrides above) are available.
+// Attach the full German translation/explanation as each item's German
+// label now that ITEM_TRANSLATIONS is available — the detailed wording
+// (e.g. "Geld – z. B. Einkommen, Ausgaben, finanzielle Offenheit") is used
+// as-is as the primary item label when the UI is in German, rather than a
+// shortened term. The English item name is still available as `item.label`
+// and is shown as the secondary cross-reference line in German mode.
 RA_CATEGORIES.forEach((category) => {
   category.items.forEach((item) => {
-    item.labelDe = germanLabelFor(item.id, item.label);
+    item.labelDe = ITEM_TRANSLATIONS[item.id] || item.label;
   });
 });
