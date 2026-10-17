@@ -69,6 +69,11 @@ export const GLOSSAR_CONTENT: Record<Locale, GlossarContent> = {
           "Die Praxis oder das Begehren, mehrere romantische Beziehungen gleichzeitig zu führen — mit dem Wissen und Einverständnis aller Beteiligten. Die konkrete Form (Hierarchie, Wohnsituation, Regeln) variiert stark von Mensch zu Mensch.",
       },
       {
+        term: "RBDSMA",
+        definition:
+          "Ein Gesprächsleitfaden für ein Vorgespräch vor einer intimen oder sexuellen Begegnung, mit sechs Bereichen: Relationships (Beziehungen), Boundaries (Grenzen), Desires (Wünsche), Sexual Health (sexuelle Gesundheit), Meaning (Bedeutung) und Aftercare (Nachsorge). Die einzelnen Fragen stehen unter Ressourcen.",
+      },
+      {
         term: "Relationship Anarchy",
         definition:
           "Ein Ansatz, der jede Beziehung individuell gestaltet, statt vorgegebenen Kategorien (Partner*in, beste Freund*in, …) automatisch bestimmte Rechte, Pflichten oder Prioritäten zuzuschreiben. Lehnt insbesondere die „Relationship Escalator“-Norm ab und betont Communitys sowie gegenseitige Unterstützung (Mutual Aid) als zentrale Stützen.",
@@ -136,6 +141,11 @@ export const GLOSSAR_CONTENT: Record<Locale, GlossarContent> = {
         term: "Polyamory",
         definition:
           "The practice or desire to have more than one romantic relationship at the same time — with the knowledge and consent of everyone involved. The exact shape (hierarchy, living situation, rules) varies a lot from person to person.",
+      },
+      {
+        term: "RBDSMA",
+        definition:
+          "A conversation framework for talking things through before an intimate or sexual encounter, covering six areas: Relationships, Boundaries, Desires, Sexual Health, Meaning and Aftercare. The individual questions are listed under Resources.",
       },
       {
         term: "Relationship Anarchy",

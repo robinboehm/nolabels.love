@@ -118,6 +118,9 @@ function localeSection(locale: Locale): string[] {
   lines.push(`## ${ressourcen.title}`, "", `Source: ${pageUrl(locale, "/ressourcen")}`, "");
   for (const resource of ressourcen.resources) {
     lines.push(`- [${resource.title}](${resource.href}) — ${resource.source}: ${resource.description}`);
+    for (const point of resource.points ?? []) {
+      lines.push(`  - **${point.key} – ${point.label}:** ${point.text}`);
+    }
   }
   lines.push("");
 
