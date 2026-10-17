@@ -1,7 +1,9 @@
 ---
+import { getAbsoluteLocaleUrl } from "astro:i18n";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { GLOSSAR_CONTENT } from "../i18n/content/glossar";
 import type { Locale } from "../i18n/locales";
+import { definedTermSetNode, glossaryAnchor } from "../seo/jsonld";
 
 interface Props {
   locale: Locale;
@@ -9,9 +11,11 @@ interface Props {
 
 const { locale } = Astro.props;
 const content = GLOSSAR_CONTENT[locale];
+const url = getAbsoluteLocaleUrl(locale, "glossar");
+const jsonLd = [definedTermSetNode(url, content.title, content.terms, locale)];
 ---
 
-<BaseLayout locale={locale} path="/glossar" title={content.title} description={content.description}>
+<BaseLayout locale={locale} path="/glossar" title={content.title} description={content.description} jsonLd={jsonLd}>
   <section class="mx-auto max-w-3xl px-5 pb-20 pt-16 sm:px-8 sm:pt-20">
     <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">{content.eyebrow}</p>
     <h1 class="mt-4 font-display text-4xl font-medium text-[var(--color-ink)] sm:text-5xl">{content.heading}</h1>
@@ -22,7 +26,7 @@ const content = GLOSSAR_CONTENT[locale];
     <dl class="mt-12 flex flex-col divide-y divide-[var(--color-line)]">
       {
         content.terms.map((entry) => (
-          <div id={entry.term.toLowerCase().replace(/[^a-z0-9]+/g, "-")} class="scroll-mt-24 py-6">
+          <div id={glossaryAnchor(entry.term)} class="scroll-mt-24 py-6">
             <dt class="font-display text-xl font-medium text-[var(--color-ink)]">{entry.term}</dt>
             <dd class="mt-2 text-sm leading-relaxed text-[var(--color-ink-soft)]">{entry.definition}</dd>
           </div>

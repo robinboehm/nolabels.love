@@ -2,12 +2,15 @@
 import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
+import sitemap from '@astrojs/sitemap';
+
+const SITE = 'https://nolabels.love';
 
 // https://astro.build/config
 export default defineConfig({
   // Served via a custom domain (see /CNAME) at the domain root, not under
   // a GitHub Pages project subpath — so `site` is enough, no `base` needed.
-  site: 'https://nolabels.love',
+  site: SITE,
   i18n: {
     locales: ['de', 'en'],
     defaultLocale: 'de',
@@ -22,6 +25,16 @@ export default defineConfig({
   redirects: {
     '/': '/de/',
   },
+  integrations: [
+    sitemap({
+      // "/" is only a redirect stub (noindex), keep it out of the sitemap.
+      filter: (page) => page !== `${SITE}/`,
+      i18n: {
+        defaultLocale: 'de',
+        locales: { de: 'de-DE', en: 'en-US' },
+      },
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

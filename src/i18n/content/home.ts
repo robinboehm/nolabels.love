@@ -20,7 +20,7 @@ export interface HomeContent {
 
 export const HOME_CONTENT: Record<Locale, HomeContent> = {
   de: {
-    title: "no labels.",
+    title: "Polyamorie, Relationship Anarchy & Non-Monogamie",
     eyebrow: "nolabels.love",
     heading: ["Beziehungen, die zu dir passen —", "nicht zu einem Label."],
     intro:
@@ -73,7 +73,7 @@ export const HOME_CONTENT: Record<Locale, HomeContent> = {
     ],
   },
   en: {
-    title: "no labels.",
+    title: "Polyamory, Relationship Anarchy & Non-Monogamy",
     eyebrow: "nolabels.love",
     heading: ["Relationships that fit you —", "not a label."],
     intro:

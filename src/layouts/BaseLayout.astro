@@ -1,24 +1,38 @@
 ---
 import "../styles/global.css";
-import { getRelativeLocaleUrl } from "astro:i18n";
+import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { LOCALES, otherLocale, type Locale } from "../i18n/locales";
+import { DEFAULT_LOCALE, LOCALES, otherLocale, type Locale } from "../i18n/locales";
+import { HOME_CONTENT } from "../i18n/content/home";
+import { OG_IMAGE, OG_LOCALE, SITE_NAME, absoluteUrl, localePathArg } from "../seo/site";
+import { webPageNode, websiteNode, type JsonLdNode } from "../seo/jsonld";
 
 interface Props {
   locale: Locale;
-  /** Locale-independent path (e.g. "/tools/board"), used for hreflang + the language switcher. */
+  /** Locale-independent path (e.g. "/tools/board"), used for canonical, hreflang + the language switcher. */
   path: string;
   title: string;
   description: string;
+  /** Page-specific schema.org nodes, merged into the page's JSON-LD @graph. */
+  jsonLd?: JsonLdNode[];
 }
 
-const { locale, path, title, description } = Astro.props;
+const { locale, path, title, description, jsonLd = [] } = Astro.props;
 
-const suffix = locale === "de" ? "no labels." : "no labels.";
-const pageTitle = title === "no labels." ? title : `${title} — ${suffix}`;
-const alt = otherLocale(locale);
-const altHref = getRelativeLocaleUrl(alt, path === "/" ? "" : path);
+const pageTitle = path === "/" ? `${SITE_NAME} — ${title}` : `${title} — ${SITE_NAME}`;
+const canonical = getAbsoluteLocaleUrl(locale, localePathArg(path));
+const altHref = getRelativeLocaleUrl(otherLocale(locale), localePathArg(path));
+const ogImage = absoluteUrl(OG_IMAGE.path);
+
+const graph = {
+  "@context": "https://schema.org",
+  "@graph": [
+    websiteNode(HOME_CONTENT[locale].intro),
+    webPageNode(canonical, pageTitle, description, locale),
+    ...jsonLd,
+  ],
+};
 ---
 
 <!doctype html>
@@ -26,22 +40,38 @@ const altHref = getRelativeLocaleUrl(alt, path === "/" ? "" : path);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#f8f1ec" />
+    <link rel="canonical" href={canonical} />
     {
       LOCALES.map((loc) => (
-        <link
-          rel="alternate"
-          hreflang={loc}
-          href={getRelativeLocaleUrl(loc, path === "/" ? "" : path, { normalizeLocale: false })}
-        />
+        <link rel="alternate" hreflang={loc} href={getAbsoluteLocaleUrl(loc, localePathArg(path))} />
       ))
     }
+    <link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl(DEFAULT_LOCALE, localePathArg(path))} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable site summary" />
+    <meta name="theme-color" content="#f8f1ec" />
+
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={OG_LOCALE[locale]} />
+    <meta property="og:locale:alternate" content={OG_LOCALE[otherLocale(locale)]} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+    <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+    <meta property="og:image:alt" content={`${SITE_NAME} — nolabels.love`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(graph).replace(/</g, "\\u003c")} />
   </head>
   <body class="flex min-h-screen flex-col font-body text-[var(--color-ink)] antialiased">
     <Header locale={locale} path={path} altHref={altHref} />

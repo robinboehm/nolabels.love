@@ -27,3 +27,9 @@ export const NAV_ITEMS: Record<Locale, NavItem[]> = {
     { path: "/coaching", label: "Coaching & Courses", comingSoon: true },
   ],
 };
+
+/** Shown in the footer only, after NAV_ITEMS. */
+export const FOOTER_EXTRA_ITEMS: Record<Locale, NavItem[]> = {
+  de: [{ path: "/faq", label: "FAQ" }],
+  en: [{ path: "/faq", label: "FAQ" }],
+};

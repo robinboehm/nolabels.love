@@ -40,6 +40,26 @@ redirects to `/de/`.
   should show in navigation, and to `src/i18n/content/` if it has
   translatable copy.
 
+### SEO & LLM discoverability
+
+- `BaseLayout` emits canonical + absolute hreflang (incl. `x-default`),
+  Open Graph/Twitter tags (image: `public/og.png`, regenerate with
+  `node scripts/generate-og-image.mjs`) and a JSON-LD `@graph`
+  (WebSite + WebPage). Views pass extra schema.org nodes via the
+  `jsonLd` prop, built with helpers from `src/seo/jsonld.ts`.
+- `@astrojs/sitemap` generates `sitemap-index.xml` with DE/EN
+  alternates; `public/robots.txt` explicitly allows search and AI
+  crawlers.
+- `/llms.txt` and `/llms-full.txt` (see llmstxt.org) are generated at
+  build time from the `src/i18n/content/` dictionaries by
+  `src/seo/llms.ts` — when adding a page, add it there too so LLMs see
+  it. `/de/faq` + `/en/faq` (`src/i18n/content/faq.ts`) is the
+  human-readable Q&A about the project and its concepts, also exposed
+  as `FAQPage` JSON-LD.
+- The board app (`public/tools/board/app/`) is `noindex, follow` on
+  purpose; the indexable pages are `/de/tools/board/` and
+  `/en/tools/board/`.
+
 ## Development
 
 When starting the dev server, use background mode:
