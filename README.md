@@ -61,6 +61,27 @@ Da alles nur lokal liegt: unterschiedliche Browser oder das Löschen der
 Browserdaten führen zu getrennten/verlorenen Ständen. Regelmäßig exportieren,
 wenn dir die Daten wichtig sind.
 
+### Versionierung der Daten
+
+Jede Person bekommt beim Anlegen ein `dataVersion`-Feld (App-Version, mit der
+sie erstellt wurde, bleibt danach unverändert), der gesamte State zusätzlich
+ein `appVersion`-Feld (App-Version, die zuletzt gespeichert hat — wird bei
+jedem Speichern aktualisiert). Beide landen automatisch in `localStorage`
+und in jeder exportierten JSON-Datei (Vollbackup wie Einzelperson-Export).
+Damit lässt sich jederzeit nachvollziehen, mit welcher App-Version ein
+Datensatz erstellt bzw. zuletzt gespeichert wurde — Grundlage für künftige
+Migrationen, falls sich das Datenformat einmal ändert. Die aktuell laufende
+Version steht außerdem klein im Footer der App.
+
+Das Versionsformat ist `<Anzahl Commits>-<Kurz-Hash>` (z. B. `11-67f9002`),
+automatisch erzeugt aus dem Git-Stand in `version.js` von
+`scripts/update-version.js`. Ein lokaler `pre-commit`-Git-Hook ruft dieses
+Skript vor jedem Commit automatisch auf; bei Bedarf manuell ausführen mit:
+
+```sh
+node scripts/update-version.js
+```
+
 ## Dateien
 
 | Datei | Zweck |
@@ -69,6 +90,8 @@ wenn dir die Daten wichtig sind.
 | `style.css` | Styling (Kreis-Board, Panel, Übersicht) |
 | `data.js` | Statische Smörgåsbord-Kategorien & Items, EN + DE |
 | `app.js` | State-Management, Rendering, localStorage, Export/Import |
+| `version.js` | Auto-generiert: `APP_VERSION` aus Commit-Anzahl + Hash |
+| `scripts/update-version.js` | Erzeugt `version.js` & bumpt `?v=`-Cache-Busting |
 
 ## Layout-Hinweis
 

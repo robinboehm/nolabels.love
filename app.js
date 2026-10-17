@@ -44,6 +44,10 @@ function migratePerson(person) {
   Object.values(person.items || {}).forEach((entry) => {
     if (entry && entry.status === 'partial') entry.status = STATUS.PARTIAL_YES;
   });
+  // Data saved before versioning existed has no dataVersion at all — tag it
+  // so it's obvious (in localStorage/exports) that it predates this scheme,
+  // rather than silently looking like it was created by the current version.
+  if (!person.dataVersion) person.dataVersion = 'pre-versioning';
   return person;
 }
 
@@ -299,6 +303,8 @@ function applyStaticTranslations() {
   document.querySelectorAll('.lang-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
+  const versionEl = document.getElementById('app-version');
+  if (versionEl) versionEl.textContent = `v${APP_VERSION}`;
 }
 
 function setLang(lang) {
@@ -328,12 +334,16 @@ function uid() {
 }
 
 function createPerson(name) {
-  return { id: uid(), name, items: {}, done: false };
+  // `dataVersion` is stamped once at creation and never overwritten
+  // afterwards — it records which app version this specific person's data
+  // was *created* with, independent of when it was last edited. See
+  // `state.appVersion` below for "last saved with" instead.
+  return { id: uid(), name, items: {}, done: false, dataVersion: APP_VERSION };
 }
 
 function createDefaultState() {
   const person = createPerson('Person 1');
-  return { people: [person], selectedPersonId: person.id };
+  return { people: [person], selectedPersonId: person.id, appVersion: APP_VERSION };
 }
 
 function loadState() {
@@ -352,6 +362,16 @@ function loadState() {
       if (typeof p.done !== 'boolean') p.done = false;
       migratePerson(p);
     });
+    if (!parsed.appVersion) parsed.appVersion = 'pre-versioning';
+    if (parsed.appVersion !== APP_VERSION) {
+      // Not an error — just a breadcrumb for debugging. Loaded data was
+      // last saved by a different app version than is currently running,
+      // which is exactly the kind of situation a future migration step
+      // would key off of.
+      console.info(
+        `RA Smörgåsbord: loaded data was last saved with version "${parsed.appVersion}", current app version is "${APP_VERSION}".`
+      );
+    }
     return parsed;
   } catch (err) {
     console.error('Konnte gespeicherte Daten nicht laden, starte mit Standardzustand.', err);
@@ -360,6 +380,10 @@ function loadState() {
 }
 
 function saveState() {
+  // Refresh on every save so this always reflects the version that most
+  // recently wrote the data (as opposed to each person's `dataVersion`,
+  // which stays fixed at creation time).
+  state.appVersion = APP_VERSION;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
@@ -1098,7 +1122,11 @@ function importData(file) {
 // tell it apart from a full backup.
 function exportPerson() {
   const person = getSelectedPerson();
-  const payload = { kind: 'ra-smorgasbord-person', person };
+  // `appVersion` here is "exported with version X" (useful context for the
+  // receiving partner); `person.dataVersion` (preserved inside `person`)
+  // is "created with version X" and travels with the person regardless of
+  // how many times it's re-exported/imported.
+  const payload = { kind: 'ra-smorgasbord-person', appVersion: APP_VERSION, person };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1128,6 +1156,11 @@ function importPersonFile(file) {
       if (!person.items) person.items = {};
       if (typeof person.done !== 'boolean') person.done = false;
       migratePerson(person);
+      if (parsed.appVersion && parsed.appVersion !== APP_VERSION) {
+        console.info(
+          `RA Smörgåsbord: imported person was exported with version "${parsed.appVersion}" (created with "${person.dataVersion}"), current app version is "${APP_VERSION}".`
+        );
+      }
 
       const existingIndex = state.people.findIndex((p) => p.id === person.id);
       if (existingIndex !== -1) {

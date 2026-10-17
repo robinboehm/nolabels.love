@@ -805,6 +805,14 @@ main {
 
 .app-footer a { color: var(--color-muted); }
 
+.app-version {
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--color-muted);
+  opacity: 0.6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 @media (max-width: 480px) {
   .topbar-row { justify-content: center; }
   .app-title { width: 100%; text-align: center; }
