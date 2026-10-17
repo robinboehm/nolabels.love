@@ -7,4 +7,4 @@
  * (localStorage + exports) so a future version of the app can tell how
  * old a given set of data is and whether a migration might be needed.
  */
-const APP_VERSION = '18-f03c904';
+const APP_VERSION = '19-461c9a4';
