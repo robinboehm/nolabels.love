@@ -205,10 +205,35 @@ main {
 
 .board-wrap {
   position: relative;
-  width: min(96vw, 900px);
+  width: min(96vw, 820px);
   aspect-ratio: 1 / 1;
   margin: 0 auto;
 }
+
+/* Concentric shaded bands behind the bubbles, echoing the original paper
+   board's dark-outer/light-inner rings so the circle reads as zoned areas
+   instead of empty space with dots scattered on it. `closest-side` makes
+   the gradient's 100% stop land exactly at the box edge (radius 50 in the
+   same units `layoutRing()` uses), so these percentages line up with the
+   actual ring radii used in app.js. */
+.board-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    var(--color-bg) 0%,
+    var(--color-bg) 18%,
+    #efe8da 18%,
+    #efe8da 33%,
+    #e3d9c3 33%,
+    #e3d9c3 50%,
+    transparent 50%
+  );
+  z-index: 0;
+}
+
 
 /* Category bubbles are adaptive rounded-rect "pills": they size to fit
    their own label instead of being squeezed into a fixed circle, which is
@@ -240,14 +265,14 @@ main {
 }
 
 .bubble--outer {
-  min-width: clamp(56px, 7.5vw, 72px);
-  max-width: clamp(78px, 9.5vw, 98px);
+  min-width: clamp(58px, 7.8vw, 75px);
+  max-width: clamp(80px, 9.8vw, 100px);
   padding: 7px 8px;
 }
 
 .bubble--inner {
-  min-width: clamp(46px, 6vw, 58px);
-  max-width: clamp(62px, 7.5vw, 76px);
+  min-width: clamp(48px, 6.2vw, 60px);
+  max-width: clamp(64px, 7.8vw, 78px);
   padding: 5px 6px;
 }
 
@@ -301,8 +326,8 @@ main {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(120px, 21vw, 190px);
-  height: clamp(120px, 21vw, 190px);
+  width: clamp(120px, 19vw, 175px);
+  height: clamp(120px, 19vw, 175px);
   border-radius: 50%;
   padding: 7px;
   z-index: 1;
@@ -359,6 +384,8 @@ main {
    breakpoint we drop the circular layout in favor of a plain wrapping grid,
    which can never overlap regardless of label length or viewport width. */
 @media (max-width: 640px) {
+  .hint { margin: 0.4rem auto 1rem; }
+
   .board-wrap {
     position: static;
     width: 100%;
@@ -366,15 +393,22 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.7rem;
   }
+
+  /* The zoned radial background is keyed to the circular layout's radii —
+     with the board collapsed to a static wrapping list below, drop it and
+     let the bubbles' own ring tints (below) carry the "zoned" grouping
+     cue instead. */
+  .board-wrap::before { display: none; }
 
   .hub {
     position: static;
     transform: none;
-    width: clamp(140px, 55vw, 190px);
-    height: clamp(140px, 55vw, 190px);
+    width: clamp(150px, 56vw, 190px);
+    height: clamp(150px, 56vw, 190px);
     order: -1;
+    margin-bottom: 0.1rem;
   }
 
   #board-rings {
@@ -382,7 +416,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     max-width: 480px;
   }
 
@@ -393,9 +427,15 @@ main {
 
   .bubble--outer,
   .bubble--inner {
-    min-width: 108px;
-    max-width: 45vw;
+    min-width: 104px;
+    max-width: 44vw;
   }
+
+  /* Faint ring-specific tint (matching the desktop zone-band colors)
+     instead of plain white, so the two groups still read as distinct
+     "zones" even without the circular background. */
+  .bubble--outer { background: #e3d9c3; }
+  .bubble--inner { background: #efe8da; }
 
   .bubble--outer .bubble-label,
   .bubble--inner .bubble-label {
@@ -849,4 +889,244 @@ main {
 @media (max-width: 480px) {
   .topbar-row { justify-content: center; }
   .app-title { width: 100%; text-align: center; }
+}
+
+/* ---------- Primary button (shared by wizard footer/done screen) ---------- */
+
+.btn-primary {
+  background: var(--color-ink);
+  color: #fff;
+  border-color: var(--color-ink);
+}
+
+.btn-primary:hover { background: #000; }
+
+/* ---------- Wizard FAB ---------- */
+
+.wizard-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 35;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--color-ink);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.wizard-fab:hover { background: #000; }
+
+.wizard-fab-icon { font-size: 1.05rem; line-height: 1; }
+
+.wizard-fab-count {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.72rem;
+  min-width: 1.3em;
+  text-align: center;
+}
+
+.wizard-fab--done { background: var(--color-fulfilled); }
+.wizard-fab--done:hover { background: var(--color-fulfilled); }
+
+@media (max-width: 480px) {
+  .wizard-fab-label { display: none; }
+  .wizard-fab { padding: 0.65rem 0.8rem; }
+}
+
+/* ---------- Wizard overlay ---------- */
+/* Mobile-first: base rules below render the wizard as a full-screen sheet,
+   which is the easiest way to answer a long run of quick questions with a
+   thumb. The min-width query further down turns it into a smaller centered
+   modal once there's enough room to spare. */
+
+.wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.wizard-overlay.hidden { display: none; }
+
+.wizard-card {
+  background: #fff;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92dvh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.18);
+  border-radius: 16px 16px 0 0;
+}
+
+.wizard-progress-track {
+  height: 4px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+.wizard-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-ink);
+  transition: width 0.25s ease;
+}
+
+.wizard-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem 0.1rem;
+  flex-shrink: 0;
+}
+
+.wizard-counter {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.wizard-close {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-muted);
+  padding: 0.3rem;
+}
+
+.wizard-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+.wizard-category {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--color-muted);
+  margin-bottom: 0.3rem;
+}
+
+.wizard-item-label {
+  font-size: clamp(1.15rem, 4.5vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+}
+
+.wizard-control { margin-top: 1.1rem; }
+
+.wizard-control .control-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+}
+
+/* Bigger, wrapping, individually-bordered choice chips — the panel's
+   connected-pill grouping works for a dense list of items, but here each
+   step gets the full width of a phone screen, so touch targets can (and
+   should) be much larger. */
+.status-group--wizard,
+.desire-group--wizard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 0;
+}
+
+.status-group--wizard .status-btn,
+.desire-group--wizard .desire-btn {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 84px;
+}
+
+.status-group--wizard .status-btn + .status-btn,
+.desire-group--wizard .desire-btn + .desire-btn {
+  border-left: 1px solid var(--color-border);
+}
+
+.wizard-footer {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.8rem 1.25rem calc(0.8rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.wizard-btn-prev,
+.wizard-btn-next {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.wizard-btn-prev:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.wizard-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 2.5rem 0.5rem;
+}
+
+.wizard-done-emoji { font-size: 2.6rem; }
+.wizard-done h3 { margin: 0; font-size: 1.15rem; }
+.wizard-done p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+  max-width: 320px;
+}
+.wizard-done .btn-primary {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 10px;
+}
+
+@media (min-width: 641px) {
+  .wizard-overlay {
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .wizard-card {
+    max-height: 85vh;
+    border-radius: 18px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  }
 }

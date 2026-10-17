@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Relationship Anarchy Smörgåsbord — Board</title>
-<link rel="stylesheet" href="style.css?v=14" />
+<link rel="stylesheet" href="style.css?v=16" />
 </head>
 <body>
 
@@ -124,6 +124,28 @@
   <div id="panel-items"></div>
 </aside>
 
+<button type="button" class="wizard-fab" id="btn-start-wizard" data-i18n-aria-label="wizardFabAriaLabel" aria-label="Wizard starten: offene Fragen nacheinander beantworten">
+  <span class="wizard-fab-icon" aria-hidden="true">🧭</span>
+  <span class="wizard-fab-label" data-i18n="wizardFabLabel">Wizard</span>
+  <span class="wizard-fab-count" id="wizard-fab-count">0</span>
+</button>
+
+<div class="wizard-overlay hidden" id="wizard-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="wizard-title-sr">
+  <h2 id="wizard-title-sr" class="sr-only" data-i18n="wizardTitle">Offene Fragen</h2>
+  <div class="wizard-card">
+    <div class="wizard-progress-track"><div class="wizard-progress-fill" id="wizard-progress-fill"></div></div>
+    <div class="wizard-header-row">
+      <span class="wizard-counter" id="wizard-counter"></span>
+      <button type="button" class="wizard-close" id="wizard-close" data-i18n-aria-label="wizardCloseAriaLabel" aria-label="Wizard schließen">✕</button>
+    </div>
+    <div class="wizard-body" id="wizard-body"></div>
+    <div class="wizard-footer">
+      <button type="button" class="btn wizard-btn-prev" id="wizard-prev" data-i18n="wizardPrev">◂ Zurück</button>
+      <button type="button" class="btn btn-primary wizard-btn-next" id="wizard-next" data-i18n="wizardNext">Weiter ▸</button>
+    </div>
+  </div>
+</div>
+
 <footer class="app-footer">
   <p data-i18n-html="footerText">
     Inhalte basieren auf dem
@@ -142,8 +164,8 @@
   <p class="app-version" id="app-version"></p>
 </footer>
 
-<script src="version.js?v=14"></script>
-<script src="data.js?v=14"></script>
-<script src="app.js?v=14"></script>
+<script src="version.js?v=16"></script>
+<script src="data.js?v=16"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>

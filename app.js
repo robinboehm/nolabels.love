@@ -269,6 +269,27 @@ const STRINGS = {
     de: 'Import fehlgeschlagen: Das ist keine gültige Personen-Datei (nutze "Person teilen" zum Exportieren).',
     en: 'Import failed: this is not a valid person file (use "Share person" to export one).',
   },
+
+  // ---------- Wizard ----------
+  // Walks through every item that still has an unanswered status and/or
+  // desire, one at a time — a fast, mobile-friendly alternative to opening
+  // each category panel individually.
+  wizardFabLabel: { de: 'Wizard', en: 'Wizard' },
+  wizardFabAriaLabel: {
+    de: 'Wizard starten: offene Fragen nacheinander beantworten',
+    en: 'Start wizard: answer open questions one by one',
+  },
+  wizardTitle: { de: 'Offene Fragen', en: 'Open questions' },
+  wizardCounter: { de: 'Frage {current} von {total}', en: 'Question {current} of {total}' },
+  wizardCloseAriaLabel: { de: 'Wizard schließen', en: 'Close wizard' },
+  wizardPrev: { de: '◂ Zurück', en: '◂ Back' },
+  wizardNext: { de: 'Weiter ▸', en: 'Next ▸' },
+  wizardDoneTitle: { de: 'Alles beantwortet! 🎉', en: 'All done! 🎉' },
+  wizardDoneBody: {
+    de: 'Es gibt gerade keine offenen Fragen mehr für {name}.',
+    en: 'There are no open questions left for {name} right now.',
+  },
+  wizardDoneClose: { de: 'Schließen', en: 'Close' },
 };
 
 /** Looks up a STRINGS entry for the current language, with {placeholder} interpolation. */
@@ -334,6 +355,8 @@ function setLang(lang) {
   applyStaticTranslations();
   renderApp();
   if (currentPanelCategoryId) openCategoryPanel(currentPanelCategoryId);
+  const wizardOverlay = document.getElementById('wizard-overlay');
+  if (wizardOverlay && !wizardOverlay.classList.contains('hidden')) renderWizardStep();
 }
 
 let state = loadState();
@@ -673,10 +696,16 @@ function renderBoard() {
   const outer = RA_CATEGORIES.filter((c) => c.ring === 'outer');
   const inner = RA_CATEGORIES.filter((c) => c.ring === 'inner');
 
-  layoutRing(outer, [45, 50]).forEach(({ category, x, y }) => {
+  // Radii are nudged slightly tighter than the original 22/50 split (most
+  // of the "distant" feeling actually came from the bare, uncolored gap
+  // between rings, which the zone-band background below now fills in —
+  // see .board-wrap::before in style.css). Keeping the radii close to the
+  // original spacing avoids reintroducing bubble collisions now that
+  // bubbles themselves are a bit bigger than before.
+  layoutRing(outer, [43, 48]).forEach(({ category, x, y }) => {
     container.appendChild(createBubbleElement(category, x, y, 'outer', person));
   });
-  layoutRing(inner, [28, 22]).forEach(({ category, x, y }) => {
+  layoutRing(inner, [30, 22]).forEach(({ category, x, y }) => {
     container.appendChild(createBubbleElement(category, x, y, 'inner', person));
   });
 
@@ -1036,6 +1065,184 @@ function refreshBackgroundViews() {
   renderBoard();
   renderOverview();
   renderMatchView();
+  updateWizardFab();
+}
+
+// ---------------------------------------------------------------------
+// Wizard: step through every open (unanswered) item one at a time
+// ---------------------------------------------------------------------
+
+// An item still counts as "open" as long as either dimension hasn't been
+// touched yet — matches what the panel would still show as the grey
+// "unbeantwortet" button being active.
+function isItemOpen(entry) {
+  return entry.status === STATUS.UNANSWERED || entry.desire === DESIRE.UNANSWERED;
+}
+
+function getOpenItemsForWizard(person) {
+  const open = [];
+  RA_CATEGORIES.forEach((category) => {
+    category.items.forEach((item) => {
+      if (isItemOpen(getItemEntry(person, item.id))) open.push({ category, item });
+    });
+  });
+  return open;
+}
+
+// The list of items to step through is frozen at the moment the wizard is
+// opened, so answering one doesn't reshuffle the remaining steps or the
+// progress count out from under the person mid-flow.
+let wizardItems = [];
+let wizardIndex = 0;
+let wizardAdvanceTimer = null;
+
+function updateWizardFab() {
+  const fab = document.getElementById('btn-start-wizard');
+  const countEl = document.getElementById('wizard-fab-count');
+  if (!fab || !countEl) return;
+  const count = getOpenItemsForWizard(getSelectedPerson()).length;
+  countEl.textContent = count > 0 ? String(count) : '✓';
+  fab.classList.toggle('wizard-fab--done', count === 0);
+}
+
+function openWizard() {
+  closeCategoryPanel();
+  wizardItems = getOpenItemsForWizard(getSelectedPerson());
+  wizardIndex = 0;
+  const overlay = document.getElementById('wizard-overlay');
+  overlay.classList.remove('hidden');
+  overlay.setAttribute('aria-hidden', 'false');
+  renderWizardStep();
+}
+
+function closeWizard() {
+  if (wizardAdvanceTimer) clearTimeout(wizardAdvanceTimer);
+  const overlay = document.getElementById('wizard-overlay');
+  // Move focus out before hiding: whatever triggered the close (the ✕ or
+  // "Fertig"/done button) lives inside the overlay, and setting
+  // aria-hidden on an ancestor of the still-focused element is invalid
+  // a11y (and browsers warn loudly about it).
+  if (overlay.contains(document.activeElement)) {
+    document.getElementById('btn-start-wizard').focus();
+  }
+  overlay.classList.add('hidden');
+  overlay.setAttribute('aria-hidden', 'true');
+  updateWizardFab();
+}
+
+function wizardGoTo(index) {
+  if (wizardAdvanceTimer) clearTimeout(wizardAdvanceTimer);
+  wizardIndex = index;
+  renderWizardStep();
+}
+
+function wizardNext() {
+  wizardGoTo(wizardIndex + 1);
+}
+
+function wizardPrev() {
+  if (wizardIndex > 0) wizardGoTo(wizardIndex - 1);
+}
+
+// Once both status & desire are set for the current step, the item is no
+// longer "open" — auto-advance after a short beat so answering one item
+// after another doesn't require an extra tap on "Weiter" every time, while
+// still leaving manual Prev/Next available for anyone who prefers it.
+function maybeAutoAdvanceWizard(entry) {
+  if (wizardAdvanceTimer) clearTimeout(wizardAdvanceTimer);
+  if (isItemOpen(entry)) return;
+  wizardAdvanceTimer = setTimeout(wizardNext, 450);
+}
+
+function renderWizardStep() {
+  const body = document.getElementById('wizard-body');
+  const counterEl = document.getElementById('wizard-counter');
+  const progressFill = document.getElementById('wizard-progress-fill');
+  const prevBtn = document.getElementById('wizard-prev');
+  const nextBtn = document.getElementById('wizard-next');
+  const total = wizardItems.length;
+
+  if (total === 0 || wizardIndex >= total) {
+    counterEl.textContent = '';
+    progressFill.style.width = '100%';
+    prevBtn.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    const person = getSelectedPerson();
+    body.innerHTML = `
+      <div class="wizard-done">
+        <div class="wizard-done-emoji" aria-hidden="true">🎉</div>
+        <h3>${escapeHtml(t('wizardDoneTitle'))}</h3>
+        <p>${escapeHtml(t('wizardDoneBody', { name: person.name }))}</p>
+        <button type="button" class="btn btn-primary" id="wizard-done-close">${escapeHtml(t('wizardDoneClose'))}</button>
+      </div>
+    `;
+    body.querySelector('#wizard-done-close').addEventListener('click', closeWizard);
+    return;
+  }
+
+  prevBtn.classList.remove('hidden');
+  nextBtn.classList.remove('hidden');
+  prevBtn.disabled = wizardIndex === 0;
+
+  const { category, item } = wizardItems[wizardIndex];
+  const person = getSelectedPerson();
+  const entry = getItemEntry(person, item.id);
+  const label = itemLabel(item);
+  const secondary = itemSecondary(item);
+
+  counterEl.textContent = t('wizardCounter', { current: wizardIndex + 1, total });
+  progressFill.style.width = `${Math.round((wizardIndex / total) * 100)}%`;
+
+  body.innerHTML = `
+    <div class="wizard-category">${escapeHtml(categoryTitle(category))}</div>
+    <div class="wizard-item-label">${escapeHtml(label)}</div>
+    ${secondary ? `
+      <details class="item-explain">
+        <summary>${escapeHtml(t('itemSecondaryToggle'))}</summary>
+        <div class="item-translation">${escapeHtml(secondary)}</div>
+      </details>
+    ` : ''}
+    <div class="wizard-control">
+      <span class="control-label">${t('controlLabelStatus')}</span>
+      <div class="status-group status-group--wizard" role="group" aria-label="${escapeHtml(t('statusGroupAriaLabel', { label }))}">
+        <button type="button" class="status-btn status-btn--unanswered" data-status="${STATUS.UNANSWERED}">${statusLabel(STATUS.UNANSWERED)}</button>
+        <button type="button" class="status-btn status-btn--unfulfilled" data-status="${STATUS.UNFULFILLED}">${statusLabel(STATUS.UNFULFILLED)}</button>
+        <button type="button" class="status-btn status-btn--partial-no" data-status="${STATUS.PARTIAL_NO}">${statusLabel(STATUS.PARTIAL_NO)}</button>
+        <button type="button" class="status-btn status-btn--partial-yes" data-status="${STATUS.PARTIAL_YES}">${statusLabel(STATUS.PARTIAL_YES)}</button>
+        <button type="button" class="status-btn status-btn--fulfilled" data-status="${STATUS.FULFILLED}">${statusLabel(STATUS.FULFILLED)}</button>
+      </div>
+    </div>
+    <div class="wizard-control">
+      <span class="control-label">${t('controlLabelDesire')}</span>
+      <div class="desire-group desire-group--wizard" role="group" aria-label="${escapeHtml(t('desireGroupAriaLabel', { label }))}">
+        <button type="button" class="desire-btn desire-btn--unanswered" data-desire="${DESIRE.UNANSWERED}">${desireLabel(DESIRE.UNANSWERED)}</button>
+        <button type="button" class="desire-btn desire-btn--unwanted" data-desire="${DESIRE.UNWANTED}">${desireLabel(DESIRE.UNWANTED)}</button>
+        <button type="button" class="desire-btn desire-btn--wanted" data-desire="${DESIRE.WANTED}">${desireLabel(DESIRE.WANTED)}</button>
+      </div>
+    </div>
+  `;
+
+  const statusButtons = body.querySelectorAll('.status-btn');
+  statusButtons.forEach((btn) => {
+    if (btn.dataset.status === entry.status) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      const updated = setItemStatus(person, item.id, btn.dataset.status);
+      statusButtons.forEach((b) => b.classList.toggle('active', b === btn));
+      refreshBackgroundViews();
+      maybeAutoAdvanceWizard(updated);
+    });
+  });
+
+  const desireButtons = body.querySelectorAll('.desire-btn');
+  desireButtons.forEach((btn) => {
+    if (btn.dataset.desire === entry.desire) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      const updated = setItemDesire(person, item.id, btn.dataset.desire);
+      desireButtons.forEach((b) => b.classList.toggle('active', b === btn));
+      refreshBackgroundViews();
+      maybeAutoAdvanceWizard(updated);
+    });
+  });
 }
 
 // ---------------------------------------------------------------------
@@ -1269,8 +1476,23 @@ function initEventListeners() {
 
   document.getElementById('panel-close').addEventListener('click', closeCategoryPanel);
   document.getElementById('panel-backdrop').addEventListener('click', closeCategoryPanel);
+
+  document.getElementById('btn-start-wizard').addEventListener('click', openWizard);
+  document.getElementById('wizard-close').addEventListener('click', closeWizard);
+  document.getElementById('wizard-prev').addEventListener('click', wizardPrev);
+  document.getElementById('wizard-next').addEventListener('click', wizardNext);
+  document.getElementById('wizard-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'wizard-overlay') closeWizard();
+  });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeCategoryPanel();
+    if (e.key !== 'Escape') return;
+    const wizardOverlay = document.getElementById('wizard-overlay');
+    if (wizardOverlay && !wizardOverlay.classList.contains('hidden')) {
+      closeWizard();
+      return;
+    }
+    closeCategoryPanel();
   });
 
   window.addEventListener('resize', () => {
@@ -1287,6 +1509,7 @@ function renderApp() {
   renderBoard();
   renderOverview();
   renderMatchView();
+  updateWizardFab();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
