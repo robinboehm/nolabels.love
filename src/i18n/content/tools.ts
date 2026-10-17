@@ -23,43 +23,43 @@ export const TOOLS_CONTENT: Record<Locale, ToolsContent> = {
   de: {
     title: "Tools",
     description:
-      "Interaktive Tools für Beziehungen jenseits vorgegebener Schablonen — den Anfang macht das Relationship Anarchy Smörgåsbord-Board.",
+      "Interaktive Tools rund um Beziehungen jenseits von Labels — bisher das Relationship Anarchy Smörgåsbord als Board.",
     eyebrow: "Tools",
-    heading: "Werkzeuge für klare Beziehungen",
+    heading: "Tools zum Ausprobieren",
     intro:
-      "Jedes Tool läuft direkt im Browser — ohne Konto, ohne Server, deine Daten bleiben bei dir. Weitere Tools kommen mit der Zeit dazu.",
+      "Kleine Werkzeuge, die ich für mich gebaut habe und hier teile. Alles läuft direkt im Browser — ohne Konto, ohne Server, die Daten bleiben auf deinem Gerät.",
     tools: [
       {
         title: "Relationship Anarchy Smörgåsbord",
         description:
-          "Bewertet pro Beziehungsperson 179 Elemente nach Status und Wunsch, vergleicht zwei ausgefüllte Boards im Match und teilt Ergebnisse per QR-Code — alles rein lokal im Browser, ohne Server.",
+          "179 mögliche Bestandteile einer Beziehung, jeweils nach Status und Wunsch einzuordnen. Zwei ausgefüllte Boards lassen sich vergleichen und per QR-Code teilen — rein lokal im Browser.",
         path: "/tools/board",
         status: "Verfügbar",
       },
     ],
     comingSoonTitle: "Bald",
-    comingSoonBody: "Weitere Tools sind in Arbeit.",
+    comingSoonBody: "Weitere Tools kommen dazu, wenn ich sie baue.",
     openCta: "Öffnen",
   },
   en: {
     title: "Tools",
     description:
-      "Interactive tools for relationships beyond pre-set templates — starting with the Relationship Anarchy Smörgåsbord board.",
+      "Interactive tools around relationships beyond labels — so far the Relationship Anarchy Smörgåsbord as a board.",
     eyebrow: "Tools",
-    heading: "Tools for clearer relationships",
+    heading: "Tools to try out",
     intro:
-      "Every tool runs right in your browser — no account, no server, your data stays with you. More tools will be added over time.",
+      "Small tools I built for myself and share here. Everything runs right in your browser — no account, no server, your data stays on your device.",
     tools: [
       {
         title: "Relationship Anarchy Smörgåsbord",
         description:
-          "Rates 179 elements per relationship by status and desire, compares two filled-out boards in a match view, and shares results via QR code — entirely local in the browser, no server.",
+          "179 possible components of a relationship, each sorted by status and desire. Two filled-out boards can be compared and shared via QR code — entirely local in the browser.",
         path: "/tools/board",
         status: "Available",
       },
     ],
     comingSoonTitle: "Coming soon",
-    comingSoonBody: "More tools are in the works.",
+    comingSoonBody: "More tools will be added as I build them.",
     openCta: "Open",
   },
 };

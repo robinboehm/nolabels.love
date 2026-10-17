@@ -28,7 +28,7 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
     eyebrow: "FAQ",
     heading: "Häufige Fragen",
     intro:
-      "Kompakte Antworten auf typische Fragen zum Projekt und zu den Begriffen dahinter — für Menschen ebenso wie für Suchmaschinen und KI-Assistenten.",
+      "Kurze Antworten auf Fragen rund um diese Sammlung und die Begriffe, die darin vorkommen.",
     machineReadableNote: "Maschinenlesbare Zusammenfassung des gesamten Projekts:",
     groups: [
       {
@@ -37,12 +37,17 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
           {
             question: "Was ist nolabels.love?",
             answer:
-              "nolabels.love ist eine zweisprachige Website (Deutsch/Englisch) mit Tools, Ressourcen, Buchempfehlungen, einem Glossar und Event-Hinweisen für Beziehungen jenseits vorgegebener Schablonen — mit Schwerpunkt auf Non-Monogamie, Polyamorie und Relationship Anarchy.",
+              "nolabels.love ist eine offene, zweisprachige Sammlung (Deutsch/Englisch) von Tools, Links, Büchern, Begriffen und Events rund um Non-Monogamie, Polyamorie und Relationship Anarchy. Sie ist als freie Ressourcenliste gedacht, nicht als Ratgeber.",
+          },
+          {
+            question: "Warum gibt es diese Sammlung?",
+            answer:
+              "Ich beschäftige mich gerade viel mit diesen Themen und habe einen Ort gesucht, um das, was mir begegnet, strukturiert zu sortieren. Statt das nur für mich zu tun, stelle ich die Sammlung hier der Community frei zur Verfügung.",
           },
           {
             question: "Für wen ist nolabels.love gedacht?",
             answer:
-              "Für alle, die nicht-monogame, polyamore oder beziehungsanarchistische Beziehungen leben oder sich dafür interessieren — aber auch für Menschen in monogamen Beziehungen oder Freundschaften, die bewusster aushandeln möchten, was ihre Beziehungen ausmachen soll.",
+              "Für alle, die sich für diese Themen interessieren und hier etwas Brauchbares finden — ganz gleich, wie sie selbst Beziehungen leben.",
           },
           {
             question: "Was kann das Relationship Anarchy Smörgåsbord Board?",
@@ -52,7 +57,7 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
           {
             question: "Wie nutze ich das Board zusammen mit einer anderen Person?",
             answer:
-              "Jede Person füllt unabhängig ein eigenes Profil aus und markiert es als fertig. Anschließend teilt ihr die Profile per Datei oder QR-Code und vergleicht sie in der Match-Ansicht. Besonders ergiebig für Gespräche sind die Punkte, bei denen eure Wünsche oder eure Wahrnehmung auseinandergehen.",
+              "Jede Person füllt unabhängig ein eigenes Profil aus und markiert es als fertig. Anschließend lassen sich die Profile per Datei oder QR-Code teilen. Die Match-Ansicht zeigt dann, wo die Einschätzungen übereinstimmen und wo sie auseinandergehen.",
           },
           {
             question: "Werden meine Daten gespeichert oder an einen Server geschickt?",
@@ -69,9 +74,9 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
               "Kategorien und Elemente basieren auf dem Relationship Anarchy Smörgåsbord (v6) von Lyrica Lawrence & Heather Orr, aktualisiert von Maxx Hill, lizenziert unter CC BY-NC-SA 4.0. Die deutschen Bezeichnungen folgen der deutschen Übersetzung von Rachel Cassandra.",
           },
           {
-            question: "Ersetzt nolabels.love eine Therapie oder Beratung?",
+            question: "Ist das hier Beratung oder Therapie?",
             answer:
-              "Nein. Die Inhalte und Tools dienen der Information und Selbstreflexion. Bei Krisen, Gewalt in Beziehungen oder starker psychischer Belastung wende dich bitte an professionelle Beratungsstellen oder Therapeut*innen.",
+              "Nein. nolabels.love ist eine persönliche Sammlung von Ressourcen, kein Ratgeber und keine Beratung. Bei Krisen, Gewalt in Beziehungen oder starker psychischer Belastung sind professionelle Beratungsstellen oder Therapeut*innen die richtige Adresse.",
           },
           {
             question: "In welchen Sprachen gibt es die Website?",
@@ -113,9 +118,9 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
               "Die „Beziehungsrolltreppe“ beschreibt den gesellschaftlich erwarteten Verlauf romantischer Beziehungen: Dating → Exklusivität → Zusammenziehen → Heirat → Kinder. Der Begriff wird meist kritisch verwendet, um zu hinterfragen, ob dieser Standardpfad zu den Bedürfnissen der Beteiligten passt.",
           },
           {
-            question: "Wie gehe ich mit Eifersucht in offenen Beziehungen um?",
+            question: "Wo finde ich etwas zum Thema Eifersucht?",
             answer:
-              "Eifersucht ist ein normales Gefühl und oft ein Hinweis auf dahinterliegende Bedürfnisse oder Ängste — etwa nach Sicherheit, Aufmerksamkeit oder Verlässlichkeit. Hilfreich ist, diese Bedürfnisse zu benennen und offen zu besprechen, statt nur Regeln über Dritte aufzustellen. Vertiefend empfehlen sich „Polysecure“ von Jessica Fern und „The Ethical Slut“ von Janet W. Hardy & Dossie Easton (siehe Bücher).",
+              "In der Bücherliste: „Polysecure“ von Jessica Fern und „The Ethical Slut“ von Janet W. Hardy & Dossie Easton beschäftigen sich beide ausführlich damit. Im Glossar steht außerdem eine Notiz zu Compersion.",
           },
         ],
       },
@@ -128,7 +133,7 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
     eyebrow: "FAQ",
     heading: "Frequently asked questions",
     intro:
-      "Short answers to common questions about the project and the concepts behind it — for people as well as search engines and AI assistants.",
+      "Short answers to questions about this collection and the terms that come up in it.",
     machineReadableNote: "Machine-readable summary of the whole project:",
     groups: [
       {
@@ -137,12 +142,17 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
           {
             question: "What is nolabels.love?",
             answer:
-              "nolabels.love is a bilingual (German/English) website with tools, resources, book recommendations, a glossary and event listings for relationships beyond pre-set templates — with a focus on non-monogamy, polyamory and relationship anarchy.",
+              "nolabels.love is an open, bilingual (German/English) collection of tools, links, books, terms and events around non-monogamy, polyamory and relationship anarchy. It's meant as a free resource list, not as an advice guide.",
+          },
+          {
+            question: "Why does this collection exist?",
+            answer:
+              "I'm currently spending a lot of time with these topics and was looking for a place to sort what I come across in a structured way. Instead of doing that just for myself, I'm sharing the collection here freely with the community.",
           },
           {
             question: "Who is nolabels.love for?",
             answer:
-              "For anyone living or curious about non-monogamous, polyamorous or relationship-anarchist relationships — but also for people in monogamous relationships or friendships who want to negotiate more deliberately what their relationships should include.",
+              "For anyone interested in these topics who finds something useful here — no matter how they live their own relationships.",
           },
           {
             question: "What does the Relationship Anarchy Smörgåsbord board do?",
@@ -152,7 +162,7 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
           {
             question: "How do I use the board together with another person?",
             answer:
-              "Each person fills out their own profile independently and marks it as done. Then you share the profiles via file or QR code and compare them in the match view. The elements where your desires or perceptions differ are usually the most valuable starting points for a conversation.",
+              "Each person fills out their own profile independently and marks it as done. The profiles can then be shared via file or QR code. The match view shows where the assessments line up and where they differ.",
           },
           {
             question: "Is my data stored or sent to a server?",
@@ -169,9 +179,9 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
               "Categories and elements are based on the Relationship Anarchy Smörgåsbord (v6) by Lyrica Lawrence & Heather Orr, updated by Maxx Hill, licensed under CC BY-NC-SA 4.0. The German labels follow the German translation by Rachel Cassandra.",
           },
           {
-            question: "Is nolabels.love a replacement for therapy or counseling?",
+            question: "Is this counseling or therapy?",
             answer:
-              "No. The content and tools are meant for information and self-reflection. In a crisis, in situations of relationship violence, or under heavy psychological strain, please reach out to professional counseling services or therapists.",
+              "No. nolabels.love is a personal collection of resources, not an advice guide or counseling service. In a crisis, in situations of relationship violence or under heavy psychological strain, professional counseling services or therapists are the right place to turn to.",
           },
           {
             question: "Which languages is the website available in?",
@@ -213,9 +223,9 @@ export const FAQ_CONTENT: Record<Locale, FaqContent> = {
               "The relationship escalator describes the socially expected course of romantic relationships: dating → exclusivity → moving in together → marriage → kids. The term is usually used critically, to question whether this default path actually fits the needs of the people involved.",
           },
           {
-            question: "How do I deal with jealousy in open relationships?",
+            question: "Where can I find something on jealousy?",
             answer:
-              "Jealousy is a normal feeling and often points to underlying needs or fears — for example around security, attention or reliability. It helps to name these needs and talk about them openly, rather than only setting rules about other people. For more depth, \"Polysecure\" by Jessica Fern and \"The Ethical Slut\" by Janet W. Hardy & Dossie Easton are good reads (see Books).",
+              "In the book list: \"Polysecure\" by Jessica Fern and \"The Ethical Slut\" by Janet W. Hardy & Dossie Easton both cover it in depth. The glossary also has a note on compersion.",
           },
         ],
       },

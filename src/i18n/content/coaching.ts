@@ -12,20 +12,20 @@ export interface CoachingContent {
 export const COACHING_CONTENT: Record<Locale, CoachingContent> = {
   de: {
     title: "Coachings & Kurse",
-    description: "Begleitung und Formate für alle, die ihre Beziehungen bewusster gestalten wollen — in Vorbereitung.",
-    badge: "Bald verfügbar",
+    description: "Eine Idee für später: Formate zum gemeinsamen Austausch und zur Begleitung rund um Beziehungen jenseits von Labels.",
+    badge: "Idee für später",
     heading: "Coachings & Kurse",
     intro:
-      "Hier entstehen Begleitformate für alle, die ihre Beziehungen bewusster gestalten wollen — ob allein, zu zweit oder im größeren Netzwerk. Noch in Vorbereitung.",
-    backCta: "← In der Zwischenzeit: Tools entdecken",
+      "Irgendwann sollen hier Formate zum gemeinsamen Austausch und zur Begleitung entstehen — allein, zu zweit oder im größeren Netzwerk. Bisher ist das nur eine Idee, noch nichts Konkretes.",
+    backCta: "← Bis dahin: zu den Tools",
   },
   en: {
     title: "Coaching & Courses",
-    description: "Guidance and formats for anyone who wants to shape their relationships more deliberately — coming soon.",
-    badge: "Coming soon",
+    description: "An idea for later: formats for sharing experiences and accompanying each other around relationships beyond labels.",
+    badge: "Idea for later",
     heading: "Coaching & Courses",
     intro:
-      "Guided formats are being developed here for anyone who wants to shape their relationships more deliberately — alone, as a couple, or within a wider network. Still in preparation.",
-    backCta: "← In the meantime: explore the tools",
+      "At some point this is meant to host formats for sharing experiences and accompanying each other — alone, as a couple or within a wider network. For now it's just an idea, nothing concrete yet.",
+    backCta: "← Until then: go to the tools",
   },
 };

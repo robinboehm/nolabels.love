@@ -17,11 +17,11 @@ export interface GlossarContent {
 export const GLOSSAR_CONTENT: Record<Locale, GlossarContent> = {
   de: {
     title: "Glossar",
-    description: "Begriffe rund um Non-Monogamie, Polyamorie und Relationship Anarchy — verständlich erklärt.",
+    description: "Begriffe rund um Non-Monogamie, Polyamorie und Relationship Anarchy — mit kurzen Notizen, wie sie meist verwendet werden.",
     eyebrow: "Glossar",
-    heading: "Begriffe erklärt",
+    heading: "Begriffe & Notizen",
     intro:
-      "Ein erster, bewusst kleiner Satz an Begriffen rund um Non-Monogamie, Polyamorie und Relationship Anarchy — Genauigkeit vor Vollständigkeit. Wird laufend erweitert.",
+      "Begriffe, die mir in Texten, Podcasts und Gesprächen immer wieder begegnen — mit kurzen Notizen, wie sie meist verwendet werden. Kein Lexikon, eher ein Arbeitsstand, der mitwächst.",
     terms: [
       {
         term: "Compersion",
@@ -87,11 +87,11 @@ export const GLOSSAR_CONTENT: Record<Locale, GlossarContent> = {
   },
   en: {
     title: "Glossary",
-    description: "Terms around non-monogamy, polyamory and relationship anarchy — explained clearly.",
+    description: "Terms around non-monogamy, polyamory and relationship anarchy — with short notes on how they're commonly used.",
     eyebrow: "Glossary",
-    heading: "Terms explained",
+    heading: "Terms & notes",
     intro:
-      "A first, deliberately small set of terms around non-monogamy, polyamory and relationship anarchy — accuracy over completeness. Expanded continuously.",
+      "Terms I keep coming across in texts, podcasts and conversations — with short notes on how they're commonly used. Not a dictionary, more a work in progress that keeps growing.",
     terms: [
       {
         term: "Compersion",

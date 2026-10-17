@@ -35,14 +35,14 @@ function pageSummaries(locale: Locale): PageSummary[] {
 }
 
 const SUMMARY =
-  "nolabels.love is a free, bilingual (German/English) website with tools, resources, book recommendations, a glossary and event listings for relationships beyond pre-set templates — with a focus on non-monogamy, polyamory and relationship anarchy.";
+  "nolabels.love is a personal, openly shared collection (German/English) of tools, links, books, glossary notes and events around non-monogamy, polyamory and relationship anarchy. The author sorts what they are currently exploring and makes it freely available to the community — a resource list, not an advice guide or counseling service.";
 
 const KEY_FACTS = [
   "Every page exists in German (/de/, default) and English (/en/); `/` redirects to `/de/`.",
   `Main tool: an interactive Relationship Anarchy Smörgåsbord board (${absoluteUrl(BOARD_APP_PATH)}). Users rate 179 relationship elements per person on two separate dimensions — status and desire — compare two people in a match view, and share profiles via file or QR code.`,
   "Privacy: the board runs entirely in the browser (localStorage). No account, no server-side storage, no tracking. QR shares put the data in the URL fragment (after #), which browsers never send to a server.",
   "The board is based on the Relationship Anarchy Smörgåsbord (v6) by Lyrica Lawrence & Heather Orr, updated by Maxx Hill, licensed CC BY-NC-SA 4.0; German labels follow the translation by Rachel Cassandra.",
-  "All tools and content are free to use, without registration. The site is informational and not a substitute for therapy or counseling.",
+  "All tools and content are free to use, without registration.",
   `Source code is public: ${REPO_URL}`,
 ];
 

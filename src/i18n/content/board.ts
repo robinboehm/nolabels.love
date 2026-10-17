@@ -21,19 +21,19 @@ export const BOARD_CONTENT: Record<Locale, BoardContent> = {
     eyebrow: "Tool",
     heading: "Relationship Anarchy Smörgåsbord",
     intro:
-      "Das Smörgåsbord bricht eine Beziehung in 179 einzelne Elemente auf — von Finanzen über Kommunikation bis Intimität. Zu jedem Punkt hältst du fest, wie es aktuell ist (Status) und wie du ihn dir wünschst (Wunsch) — zwei bewusst getrennte Dimensionen.",
+      "Das Relationship Anarchy Smörgåsbord ist eine Liste von 179 möglichen Bestandteilen einer Beziehung — von Finanzen über Kommunikation bis Intimität. Ich habe es als interaktives Board umgesetzt: Zu jedem Punkt lässt sich festhalten, wie es aktuell ist (Status) und wie man es sich wünscht (Wunsch).",
     openCta: "Board öffnen",
     cards: [
       {
         title: "Match-Vergleich",
-        body: "Füllt unabhängig voneinander je ein eigenes Profil aus und vergleicht anschließend, wo Wunsch und Wahrnehmung übereinstimmen — und wo sich ein Gespräch lohnt.",
+        body: "Zwei Personen können unabhängig voneinander je ein Profil ausfüllen und danach nebeneinander sehen, wo Wunsch und Wahrnehmung übereinstimmen und wo nicht.",
       },
       {
         title: "QR-Code teilen",
         body: "Ein Profil lässt sich direkt per QR-Code an ein zweites Handy übergeben — die Daten stecken komplett im Code selbst, es gibt keinen Server, der etwas davon zu sehen bekommt.",
       },
       {
-        title: "Deine Daten bleiben bei dir",
+        title: "Daten bleiben lokal",
         body: "Alles wird ausschließlich lokal im Browser gespeichert (localStorage). Es gibt kein Konto, keinen Server und kein Tracking — Export/Import (als Datei oder QR-Code) ist der einzige Weg, Daten zu bewegen.",
       },
     ],
@@ -48,19 +48,19 @@ export const BOARD_CONTENT: Record<Locale, BoardContent> = {
     eyebrow: "Tool",
     heading: "Relationship Anarchy Smörgåsbord",
     intro:
-      "The Smörgåsbord breaks a relationship down into 179 individual elements — from finances to communication to intimacy. For each one, you record how it currently is (status) and how you'd like it to be (desire) — two deliberately separate dimensions.",
+      "The Relationship Anarchy Smörgåsbord is a list of 179 possible components of a relationship — from finances to communication to intimacy. I built it as an interactive board: for each item you can note how it currently is (status) and how you'd like it to be (desire).",
     openCta: "Open board",
     cards: [
       {
         title: "Match comparison",
-        body: "Fill out your own profile independently, then compare where desire and perception line up — and where a conversation is worth having.",
+        body: "Two people can each fill out a profile independently and then see side by side where desire and perception line up and where they don't.",
       },
       {
         title: "Share via QR code",
         body: "A profile can be handed straight to a second phone via QR code — the data lives entirely inside the code itself, no server ever sees any of it.",
       },
       {
-        title: "Your data stays with you",
+        title: "Data stays local",
         body: "Everything is stored locally in the browser only (localStorage). There's no account, no server and no tracking — export/import (as a file or QR code) is the only way data moves.",
       },
     ],

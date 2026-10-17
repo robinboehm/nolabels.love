@@ -7,7 +7,7 @@ export const UI = {
     menuOpen: "Menü öffnen",
     menuClose: "Menü schließen",
     footerTagline:
-      "Ressourcen und Tools für Beziehungen jenseits vorgegebener Schablonen — mit Schwerpunkt auf Non-Monogamie, Polyamorie und Relationship Anarchy.",
+      "Eine offene Sammlung zu Non-Monogamie, Polyamorie und Relationship Anarchy — frei zum Stöbern und Weitergeben.",
     footerBoardLicensePrefix: "Das Board basiert auf dem Relationship Anarchy Smörgåsbord (v6), lizenziert unter",
   },
   en: {
@@ -16,7 +16,7 @@ export const UI = {
     menuOpen: "Open menu",
     menuClose: "Close menu",
     footerTagline:
-      "Resources and tools for relationships beyond pre-set templates — with a focus on non-monogamy, polyamory and relationship anarchy.",
+      "An open collection on non-monogamy, polyamory and relationship anarchy — free to browse and pass on.",
     footerBoardLicensePrefix: "The Board is based on the Relationship Anarchy Smörgåsbord (v6), licensed under",
   },
 } satisfies Record<Locale, Record<string, string>>;
