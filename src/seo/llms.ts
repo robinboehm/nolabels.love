@@ -110,7 +110,11 @@ function localeSection(locale: Locale): string[] {
   const buecher = BUECHER_CONTENT[locale];
   lines.push(`## ${buecher.title}`, "", `Source: ${pageUrl(locale, "/buecher")}`, "");
   for (const book of buecher.books) {
-    lines.push(`- **${book.title}** (${book.author}): ${book.summary}`);
+    const title = book.subtitle ? `${book.title}: ${book.subtitle}` : book.title;
+    const meta = [book.author, book.publisher, book.isbn && `ISBN ${book.isbn}`, buecher.languageLabels[book.language]]
+      .filter(Boolean)
+      .join(", ");
+    lines.push(`- **${title}** (${meta}): ${book.summary}`);
   }
   lines.push("");
 

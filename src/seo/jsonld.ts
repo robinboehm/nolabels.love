@@ -78,9 +78,13 @@ export function bookListNode(url: string, name: string, books: BookEntry[]): Jso
       position: i + 1,
       item: {
         "@type": "Book",
-        name: book.title,
+        name: book.subtitle ? `${book.title}: ${book.subtitle}` : book.title,
         author: book.author.split(/\s*&\s*/).map((author) => ({ "@type": "Person", name: author })),
         description: book.summary,
+        inLanguage: book.language,
+        image: absoluteUrl(book.cover),
+        ...(book.isbn && { isbn: book.isbn.replace(/-/g, "") }),
+        ...(book.publisher && { publisher: { "@type": "Organization", name: book.publisher } }),
       },
     })),
   };

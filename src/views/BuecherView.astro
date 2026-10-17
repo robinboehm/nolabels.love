@@ -28,10 +28,29 @@ const jsonLd = [bookListNode(url, content.heading, content.books)];
     <ul class="mt-12 flex flex-col gap-6">
       {
         content.books.map((book) => (
-          <li class="rounded-3xl border border-[var(--color-line)] bg-white/60 p-7">
-            <p class="font-display text-2xl font-medium text-[var(--color-ink)]">{book.title}</p>
-            <p class="mt-1 text-sm font-semibold text-[var(--color-muted)]">{book.author}</p>
-            <p class="mt-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">{book.summary}</p>
+          <li class="flex flex-col gap-5 rounded-3xl border border-[var(--color-line)] bg-white/60 p-6 sm:flex-row sm:gap-7 sm:p-7">
+            <img
+              src={book.cover}
+              alt={`${content.coverAlt}: ${book.title}`}
+              width="160"
+              height="240"
+              loading="lazy"
+              decoding="async"
+              class="h-auto w-24 shrink-0 self-start rounded-md shadow-md ring-1 ring-black/5 sm:w-28"
+            />
+            <div class="min-w-0">
+              <p lang={book.language} class="font-display text-2xl font-medium text-[var(--color-ink)]">{book.title}</p>
+              {book.subtitle && <p lang={book.language} class="mt-1 text-sm text-[var(--color-ink-soft)]">{book.subtitle}</p>}
+              <p class="mt-2 text-sm font-semibold text-[var(--color-muted)]">{book.author}</p>
+              <p class="mt-3 text-sm leading-relaxed text-[var(--color-ink-soft)]">{book.summary}</p>
+              <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-[var(--color-muted)]">
+                <span class="rounded-full bg-[var(--color-accent)]/20 px-2.5 py-0.5 font-semibold text-[var(--color-primary-dark)]">
+                  {content.languageLabels[book.language]}
+                </span>
+                {book.publisher && <span>{book.publisher}</span>}
+                {book.isbn && <span>ISBN {book.isbn}</span>}
+              </p>
+            </div>
           </li>
         ))
       }
