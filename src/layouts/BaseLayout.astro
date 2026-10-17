@@ -1,23 +1,28 @@
 ---
 import "../styles/global.css";
+import { getRelativeLocaleUrl } from "astro:i18n";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { LOCALES, otherLocale, type Locale } from "../i18n/locales";
 
 interface Props {
+  locale: Locale;
+  /** Locale-independent path (e.g. "/tools/board"), used for hreflang + the language switcher. */
+  path: string;
   title: string;
-  description?: string;
+  description: string;
 }
 
-const {
-  title,
-  description = "nolabels.love sammelt Ressourcen und Tools für Beziehungen jenseits vorgegebener Schablonen — mit Schwerpunkt auf Non-Monogamie, Polyamorie und Relationship Anarchy.",
-} = Astro.props;
+const { locale, path, title, description } = Astro.props;
 
-const pageTitle = title === "no labels." ? title : `${title} — no labels.`;
+const suffix = locale === "de" ? "no labels." : "no labels.";
+const pageTitle = title === "no labels." ? title : `${title} — ${suffix}`;
+const alt = otherLocale(locale);
+const altHref = getRelativeLocaleUrl(alt, path === "/" ? "" : path);
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,12 +33,21 @@ const pageTitle = title === "no labels." ? title : `${title} — no labels.`;
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#f8f1ec" />
+    {
+      LOCALES.map((loc) => (
+        <link
+          rel="alternate"
+          hreflang={loc}
+          href={getRelativeLocaleUrl(loc, path === "/" ? "" : path, { normalizeLocale: false })}
+        />
+      ))
+    }
   </head>
   <body class="flex min-h-screen flex-col font-body text-[var(--color-ink)] antialiased">
-    <Header />
+    <Header locale={locale} path={path} altHref={altHref} />
     <main class="flex-1">
       <slot />
     </main>
-    <Footer />
+    <Footer locale={locale} />
   </body>
 </html>

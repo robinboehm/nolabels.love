@@ -11,8 +11,34 @@ untouched — it is *not* an Astro page and doesn't use Tailwind. It has its
 own cache-busting/versioning via `scripts/update-version.cjs` (run
 automatically by the `pre-commit` git hook) — don't "modernize" it into
 Astro components without discussing it first, it's intentionally
-dependency-free. `src/pages/tools/board.astro` is the Astro-side landing
-page that links to it.
+dependency-free. It also has its own internal DE/EN toggle (stored in
+`localStorage`), independent of the site-level locale below — so it's
+served from a single shared path (`/tools/board/app/`), not duplicated
+per locale.
+
+### i18n (German/English)
+
+The whole site is mirrored under `/de/` and `/en/` using Astro's native
+i18n routing (`i18n` + `redirects` in `astro.config.mjs`,
+`prefixDefaultLocale: true`, default locale `de`). `/` statically
+redirects to `/de/`.
+
+- `src/pages/de/**` and `src/pages/en/**` are thin wrappers — each just
+  renders the matching component from `src/views/` with a `locale` prop.
+  Add new pages in both locale folders, pointing at a shared view.
+- `src/views/*View.astro` hold the actual markup and wrap content in
+  `BaseLayout` (pass `locale` + the locale-independent `path`, used for
+  hreflang tags and the language switcher).
+- `src/i18n/content/*.ts` hold the bilingual copy per page
+  (`{ de: {...}, en: {...} }`); `src/i18n/nav.ts` and `src/i18n/ui.ts`
+  hold shared nav labels / UI strings.
+- `Header.astro`/`Footer.astro` build locale-aware links via
+  `getRelativeLocaleUrl` from `astro:i18n` — never hardcode `/tools`
+  style paths without going through that helper (or the page will link
+  across locales).
+- When adding a page, add it to both `src/i18n/nav.ts` locales if it
+  should show in navigation, and to `src/i18n/content/` if it has
+  translatable copy.
 
 ## Development
 

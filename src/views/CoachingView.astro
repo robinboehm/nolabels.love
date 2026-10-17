@@ -1,26 +1,31 @@
 ---
+import { getRelativeLocaleUrl } from "astro:i18n";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { COACHING_CONTENT } from "../i18n/content/coaching";
+import type { Locale } from "../i18n/locales";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const content = COACHING_CONTENT[locale];
 ---
 
-<BaseLayout
-  title="Coachings & Kurse"
-  description="Begleitung und Formate für alle, die ihre Beziehungen bewusster gestalten wollen — in Vorbereitung."
->
+<BaseLayout locale={locale} path="/coaching" title={content.title} description={content.description}>
   <section class="mx-auto max-w-2xl px-5 pb-24 pt-16 text-center sm:px-8 sm:pt-20">
     <span class="inline-block rounded-full bg-[var(--color-accent)]/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-primary-dark)]">
-      Bald verfügbar
+      {content.badge}
     </span>
-    <h1 class="mt-6 font-display text-4xl font-medium text-[var(--color-ink)] sm:text-5xl">Coachings &amp; Kurse</h1>
+    <h1 class="mt-6 font-display text-4xl font-medium text-[var(--color-ink)] sm:text-5xl">{content.heading}</h1>
     <p class="mt-5 text-lg leading-relaxed text-[var(--color-ink-soft)]">
-      Hier entstehen Begleitformate für alle, die ihre Beziehungen bewusster
-      gestalten wollen — ob allein, zu zweit oder im größeren Netzwerk.
-      Noch in Vorbereitung.
+      {content.intro}
     </p>
     <a
-      href="/tools"
+      href={getRelativeLocaleUrl(locale, "tools")}
       class="mt-9 inline-flex items-center gap-2 rounded-full border border-[var(--color-ink)]/20 px-7 py-3 text-sm font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-bg-soft)]"
     >
-      ← In der Zwischenzeit: Tools entdecken
+      {content.backCta}
     </a>
   </section>
 </BaseLayout>
