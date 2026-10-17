@@ -121,72 +121,81 @@ RA_CATEGORIES.forEach((category) => {
 });
 
 /**
- * German translation + short explanation for every item, keyed by item id
+ * German translation + explanation for every item, keyed by item id
  * ("<categoryId>__<slug>"). Shown as secondary/gray helper text in the
  * detail panel — the original English terms stay the primary label.
+ *
+ * Each entry is written to read naturally as a completion of the board's
+ * framing question, "Unsere Beziehung beinhaltet …" ("Our relationship
+ * includes …") — see `panelFraming` in app.js. Wording is also informed by
+ * Andie Nordgren's "The short instructional manifesto for relationship
+ * anarchy" (2006) — https://log.andie.se/post/26652940513/ — in particular
+ * its emphasis on explicit, consent-based agreements that are custom-made
+ * for each relationship rather than assumed defaults, and on treating each
+ * relationship as independent and non-comparable rather than ranked.
  */
 const ITEM_TRANSLATIONS = {
   // Financial
-  'financial__money': 'Geld – z. B. Einkommen, Ausgaben, finanzielle Offenheit',
-  'financial__payments': 'Zahlungen – wer bezahlt wofür, gemeinsame Kosten',
-  'financial__responsibilities': 'Verantwortlichkeiten – finanzielle Pflichten und Zuständigkeiten',
-  'financial__property': 'Eigentum – gemeinsamer oder getrennter Besitz',
-  'financial__sharing-resources': 'Ressourcen teilen – z. B. Auto, Werkzeug, Wohnraum',
-  'financial__mutual-aid': 'Gegenseitige Unterstützung – sich in Notlagen finanziell aushelfen',
-  'financial__businesses': 'Geschäfte – gemeinsame Unternehmungen oder Firmen',
+  'financial__money': 'Geld – offen über Einkommen, Ausgaben und finanzielle Gewohnheiten sprechen',
+  'financial__payments': 'Zahlungen – wer wofür aufkommt, ohne dass Kosten automatisch hälftig geteilt werden müssen',
+  'financial__responsibilities': 'Finanzielle Verantwortlichkeiten – klar besprochene Zuständigkeiten statt stillschweigender Annahmen',
+  'financial__property': 'Eigentum – bewusst entscheiden, was ihr gemeinsam besitzt und was getrennt bleibt',
+  'financial__sharing-resources': 'Ressourcen teilen – z. B. Auto, Werkzeug oder Wohnraum gemeinsam nutzen',
+  'financial__mutual-aid': 'Gegenseitige Unterstützung – einander in finanziellen Notlagen aushelfen, ohne aufzurechnen',
+  'financial__businesses': 'Geschäfte – gemeinsame Unternehmungen, Firmen oder Projekte mit wirtschaftlichem Ziel',
 
   // Power / Hierarchy
-  'power-hierarchy__boss-employee': 'Chef*in – Angestellte*r – ein berufliches Machtgefälle in der Beziehung',
-  'power-hierarchy__sponsor-sponsee': 'Sponsor*in – Schützling – z. B. in Selbsthilfegruppen wie den 12 Schritten',
-  'power-hierarchy__teacher-student': 'Lehrer*in – Schüler*in – ein Lern-/Machtgefälle',
-  'power-hierarchy__mentor-guide': 'Mentor*in – gibt Rat und Orientierung',
+  'power-hierarchy__boss-employee': 'Chef*in – Angestellte*r – ein beruflich bedingtes Machtgefälle, das in der Beziehung mitgedacht wird',
+  'power-hierarchy__sponsor-sponsee': 'Sponsor*in – Schützling – z. B. in Selbsthilfegruppen wie den 12 Schritten, mit bewusst asymmetrischer Rolle',
+  'power-hierarchy__teacher-student': 'Lehrer*in – Schüler*in – ein Lern- und Machtgefälle, das bewusst gehalten wird',
+  'power-hierarchy__mentor-guide': 'Mentor*in – gibt Rat und Orientierung, ohne dass daraus automatisch Entscheidungsgewalt folgt',
 
   // Companionship
-  'companionship__playfulness': 'Verspieltheit – gemeinsam albern sein und Spaß haben',
-  'companionship__shared-activity-interests': 'Gemeinsame Aktivitäten/Interessen – geteilte Hobbys',
-  'companionship__intellectual-philosophical-discussions': 'Intellektuelle & philosophische Gespräche',
-  'companionship__friendship': 'Freundschaft – als Basis der Beziehung',
+  'companionship__playfulness': 'Verspieltheit – miteinander albern sein und Leichtigkeit teilen',
+  'companionship__shared-activity-interests': 'Gemeinsame Aktivitäten/Interessen – geteilte Hobbys und Leidenschaften',
+  'companionship__intellectual-philosophical-discussions': 'Intellektuelle & philosophische Gespräche – Ideen und Weltanschauungen gemeinsam durchdenken',
+  'companionship__friendship': 'Freundschaft – als eigenständige, gleichwertige Basis der Beziehung, nicht nur als Vorstufe zu etwas „Größerem“',
 
   // Religious / Spiritual
   'religious-spiritual__shared-ritual-prayer': 'Gemeinsames Ritual / Gebet',
-  'religious-spiritual__shared-beliefs': 'Geteilte Glaubensvorstellungen',
-  'religious-spiritual__discussions': 'Gespräche über Glauben/Spiritualität',
-  'religious-spiritual__ceremony': 'Zeremonie – z. B. religiöse Feiern gemeinsam begehen',
-  'religious-spiritual__traditions': 'Traditionen – gemeinsam gepflegte Bräuche',
-  'religious-spiritual__magic': 'Magie – z. B. Ritualarbeit, Hexerei',
-  'religious-spiritual__divination': 'Wahrsagen – z. B. Tarot, Pendeln, Horoskope',
+  'religious-spiritual__shared-beliefs': 'Geteilte Glaubensvorstellungen oder spirituelle Weltbilder',
+  'religious-spiritual__discussions': 'Gespräche über Glauben, Zweifel und Spiritualität',
+  'religious-spiritual__ceremony': 'Zeremonie – gemeinsam religiöse oder spirituelle Feiern begehen',
+  'religious-spiritual__traditions': 'Traditionen – gemeinsam gepflegte Bräuche und Rituale',
+  'religious-spiritual__magic': 'Magie – z. B. gemeinsame Ritualarbeit oder Hexerei',
+  'religious-spiritual__divination': 'Wahrsagen – z. B. Tarot, Pendeln oder Horoskope gemeinsam nutzen',
 
   // Future Plans
-  'future-plans__relationship-duration': 'Dauer der Beziehung – kurzfristig oder langfristig gedacht',
-  'future-plans__children': 'Kinder – gemeinsamer Kinderwunsch oder Erziehung',
-  'future-plans__community': 'Gemeinschaft – gemeinsames soziales Umfeld aufbauen',
-  'future-plans__living-preferences': 'Wohnvorstellungen – wo/wie man leben möchte',
-  'future-plans__career-importance': 'Stellenwert der Karriere in der Beziehung',
+  'future-plans__relationship-duration': 'Vorstellungen zur Dauer der Beziehung – bewusst offen, befristet oder langfristig gedacht, statt automatisch „für immer“',
+  'future-plans__children': 'Kinder – gemeinsamer Kinderwunsch, Erziehung oder Mitverantwortung',
+  'future-plans__community': 'Gemeinschaft – ein gemeinsames soziales Umfeld und Netzwerk aufbauen',
+  'future-plans__living-preferences': 'Wohnvorstellungen – ob, wo und wie ihr (zusammen) leben möchtet',
+  'future-plans__career-importance': 'Stellenwert der Karriere – wie viel Raum Beruf und Ambitionen in der Beziehung einnehmen',
 
   // Labels/Terms
-  'labels-terms__spouses': 'Ehepartner*innen',
-  'labels-terms__parent': 'Elternteil',
-  'labels-terms__cousin': 'Cousin/Cousine',
-  'labels-terms__sibling': 'Geschwister',
-  'labels-terms__datemate': 'Datemate – romantische Bezugsperson ohne feste Kategorie wie „Freund*in“',
-  'labels-terms__chosen-family': 'Wahlfamilie – nicht blutsverwandte, selbst gewählte Familie',
-  'labels-terms__social-media-official': 'In sozialen Medien offiziell als Paar/Beziehung gekennzeichnet',
+  'labels-terms__spouses': 'Ehepartner*innen – als selbst gewählte Bezeichnung, nicht nur als rechtlicher Status',
+  'labels-terms__parent': 'Elternteil – als Bezeichnung für eine enge Bezugsperson, nicht zwingend die biologische Rolle',
+  'labels-terms__cousin': 'Cousin/Cousine – als frei gewählte Bezeichnung für eine nahe, nicht-romantische Bindung',
+  'labels-terms__sibling': 'Geschwister – als Bezeichnung für eine enge, familienähnliche Bindung ohne romantischen Rahmen',
+  'labels-terms__datemate': 'Datemate – eine romantische Bezugsperson jenseits klassischer Kategorien wie „Freund*in“ oder „Partner*in“',
+  'labels-terms__chosen-family': 'Wahlfamilie – selbst gewählte, nicht blutsverwandte Familie',
+  'labels-terms__social-media-official': 'Offiziell in sozialen Medien als Paar/Beziehung gekennzeichnet',
   'labels-terms__terms-of-affection': 'Kosenamen / liebevolle Bezeichnungen füreinander',
 
   // Marginalization, Privilege, Allyship, & Advocacy
-  'marginalization__race': 'Ethnische Herkunft / Rassismus-Erfahrungen',
-  'marginalization__disability': 'Behinderung',
-  'marginalization__gender': 'Geschlecht(sidentität)',
-  'marginalization__class': 'Soziale Klasse / Herkunft',
-  'marginalization__citizenship': 'Staatsbürgerschaft / Aufenthaltsstatus',
-  'marginalization__sexuality': 'Sexuelle Orientierung',
-  'marginalization__size': 'Körpergröße/-form (z. B. Size-Diskriminierung)',
-  'marginalization__beauty': 'Schönheitsideale/-normen',
-  'marginalization__religion': 'Religion(szugehörigkeit)',
-  'marginalization__neurodivergence': 'Neurodivergenz – z. B. ADHS, Autismus',
+  'marginalization__race': 'Ethnische Herkunft – Rassismus-Erfahrungen erkennen und einander darin unterstützen',
+  'marginalization__disability': 'Behinderung – Zugänglichkeit und Unterstützungsbedarf gemeinsam mitdenken',
+  'marginalization__gender': 'Geschlecht(sidentität) – wie Geschlecht die Beziehung und ihre Außenwahrnehmung prägt',
+  'marginalization__class': 'Soziale Klasse/Herkunft – unterschiedliche Startbedingungen und Ressourcen wahrnehmen',
+  'marginalization__citizenship': 'Staatsbürgerschaft/Aufenthaltsstatus – rechtliche Unsicherheiten gemeinsam navigieren',
+  'marginalization__sexuality': 'Sexuelle Orientierung – Sichtbarkeit und gesellschaftliche Reaktionen gemeinsam einordnen',
+  'marginalization__size': 'Körpergröße/-form – Diskriminierung aufgrund von Aussehen erkennen und ihr entgegentreten',
+  'marginalization__beauty': 'Schönheitsideale/-normen – gemeinsam hinterfragen, was als „schön“ gilt',
+  'marginalization__religion': 'Religion(szugehörigkeit) – wie diese die Beziehung und den Umgang miteinander prägt',
+  'marginalization__neurodivergence': 'Neurodivergenz – z. B. ADHS oder Autismus und wie das Bedürfnisse & Kommunikation prägt',
 
   // Legal
-  'legal__power-of-attorney': 'Vollmacht – z. B. für medizinische/finanzielle Entscheidungen',
+  'legal__power-of-attorney': 'Vollmacht – z. B. für medizinische oder finanzielle Entscheidungen im Ernstfall',
   'legal__business-partner': 'Geschäftspartner*in',
   'legal__adoption': 'Adoption',
   'legal__marriage': 'Ehe',
@@ -194,46 +203,46 @@ const ITEM_TRANSLATIONS = {
   'legal__civil-partnership': 'Eingetragene Lebenspartnerschaft',
 
   // Public Displays of Affection
-  'pda__events': 'Bei Veranstaltungen als Paar/Beziehung auftreten',
-  'pda__friends': 'Vor Freund*innen offen zeigen',
-  'pda__family': 'Vor Familie offen zeigen',
-  'pda__work': 'Am Arbeitsplatz offen zeigen',
-  'pda__social-media': 'In sozialen Medien zeigen',
-  'pda__seen-together': 'Öffentlich zusammen gesehen werden',
-  'pda__outness': 'Offenheit – wie offen die Beziehung nach außen ist',
+  'pda__events': 'Bei Veranstaltungen offen als Paar/Beziehung auftreten',
+  'pda__friends': 'Vor Freund*innen offen zeigen, dass ihr zusammen seid',
+  'pda__family': 'Vor der eigenen Familie offen zeigen, dass ihr zusammen seid',
+  'pda__work': 'Am Arbeitsplatz offen zeigen, dass ihr zusammen seid',
+  'pda__social-media': 'In sozialen Medien zeigen, dass ihr zusammen seid',
+  'pda__seen-together': 'Öffentlich zusammen gesehen werden, ohne es extra erklären zu müssen',
+  'pda__outness': 'Offenheit – wie offen die Beziehung insgesamt nach außen gelebt wird',
 
   // Partnership
-  'partnership__shared-goals-values': 'Gemeinsame Ziele/Werte',
+  'partnership__shared-goals-values': 'Gemeinsame Ziele und Werte, auf die ihr euch bewusst geeinigt habt',
   'partnership__routine': 'Gemeinsame Routine/Alltag',
-  'partnership__embracing-change': 'Veränderungen gemeinsam annehmen',
-  'partnership__consistency': 'Verlässlichkeit/Beständigkeit',
-  'partnership__commitment': 'Verbindlichkeit/Engagement',
-  'partnership__reliability': 'Zuverlässigkeit',
+  'partnership__embracing-change': 'Veränderungen gemeinsam annehmen, statt an einem festen Bild der Beziehung festzuhalten',
+  'partnership__consistency': 'Verlässlichkeit/Beständigkeit im Miteinander',
+  'partnership__commitment': 'Verbindlichkeit – ein bewusst eingegangenes, selbst definiertes Engagement füreinander statt einer erwarteten Norm',
+  'partnership__reliability': 'Zuverlässigkeit – darauf bauen können, dass Zusagen eingehalten werden',
 
   // Collaborative
-  'collaborative__working-together': 'Zusammenarbeiten – z. B. an Projekten',
+  'collaborative__working-together': 'Zusammenarbeiten – z. B. an gemeinsamen Vorhaben',
   'collaborative__teaching': 'Sich gegenseitig etwas beibringen',
   'collaborative__projects': 'Gemeinsame Projekte',
   'collaborative__organizations': 'Gemeinsames Engagement in Organisationen',
   'collaborative__associations': 'Gemeinsame Mitgliedschaften/Vereine',
 
   // Exclusivity
-  'exclusivity__sexual': 'Sexuelle Exklusivität',
-  'exclusivity__emotional': 'Emotionale Exklusivität',
-  'exclusivity__social': 'Soziale Exklusivität',
-  'exclusivity__structural': 'Strukturelle Exklusivität – z. B. gemeinsames Zuhause nur mit dieser Person',
-  'exclusivity__romantic': 'Romantische Exklusivität',
-  'exclusivity__specific-activities': 'Exklusivität bei bestimmten Aktivitäten',
+  'exclusivity__sexual': 'Sexuelle Exklusivität – bewusst vereinbart, nicht automatisch vorausgesetzt',
+  'exclusivity__emotional': 'Emotionale Exklusivität – ob emotionale Nähe dieser Tiefe nur hier stattfindet',
+  'exclusivity__social': 'Soziale Exklusivität – z. B. nur gemeinsam auf Veranstaltungen auftreten',
+  'exclusivity__structural': 'Strukturelle Exklusivität – z. B. nur mit dieser Person zusammenwohnen oder Finanzen teilen',
+  'exclusivity__romantic': 'Romantische Exklusivität – ob romantische Gefühle oder Dates exklusiv bleiben',
+  'exclusivity__specific-activities': 'Exklusivität bei bestimmten Aktivitäten – z. B. eine Aktivität, die ihr nur zusammen macht',
 
   // Professional/Work
   'professional-work__combining-social-collaborative-financial':
-    'Soziales, Zusammenarbeit & Finanzielles im Beruf verbinden',
+    'Soziales, Zusammenarbeit & Finanzielles im Beruf miteinander verbinden',
   'professional-work__colleagues': 'Kolleg*innen',
   'professional-work__partners': 'Geschäftspartner*innen',
   'professional-work__co-operatives': 'Genossenschaften / gemeinsame Kooperativen',
 
   // Technology
-  'technology__sharing-accounts-licenses': 'Accounts/Lizenzen teilen – z. B. Streaming-Dienste',
+  'technology__sharing-accounts-licenses': 'Accounts/Lizenzen teilen – z. B. Streaming-Dienste gemeinsam nutzen',
   'technology__shared-tools-consoles': 'Geräte/Konsolen gemeinsam nutzen',
   'technology__passwords': 'Passwörter teilen',
 
@@ -241,23 +250,23 @@ const ITEM_TRANSLATIONS = {
   'communication-methods__video': 'Videotelefonie',
   'communication-methods__phone': 'Telefonieren',
   'communication-methods__text': 'Textnachrichten',
-  'communication-methods__sexting': 'Sexting – erotische Nachrichten',
+  'communication-methods__sexting': 'Sexting – erotische Nachrichten austauschen',
   'communication-methods__written': 'Briefe/Geschriebenes',
   'communication-methods__in-person-visits': 'Persönliche Besuche',
-  'communication-methods__relationship-meetings': 'Beziehungsgespräche – feste Termine zum Austausch',
+  'communication-methods__relationship-meetings': 'Beziehungsgespräche – feste Termine für bewussten Austausch über die Beziehung',
 
   // Communication Frequency
-  'communication-frequency__daily': 'Täglich',
-  'communication-frequency__weekly': 'Wöchentlich',
-  'communication-frequency__monthly': 'Monatlich',
-  'communication-frequency__annually': 'Jährlich',
-  'communication-frequency__inconsistently': 'Unregelmäßig',
+  'communication-frequency__daily': 'Täglicher Kontakt',
+  'communication-frequency__weekly': 'Wöchentlicher Kontakt',
+  'communication-frequency__monthly': 'Monatlicher Kontakt',
+  'communication-frequency__annually': 'Jährlicher Kontakt',
+  'communication-frequency__inconsistently': 'Unregelmäßiger, spontaner Kontakt',
   'communication-frequency__check-ins': 'Kurze Check-ins zwischendurch',
-  'communication-frequency__emergencies': 'Nur in Notfällen',
+  'communication-frequency__emergencies': 'Kontakt nur in Notfällen',
 
   // Domestic
-  'domestic__routines': 'Alltagsroutinen',
-  'domestic__chores': 'Haushaltsaufgaben',
+  'domestic__routines': 'Gemeinsame Alltagsroutinen',
+  'domestic__chores': 'Haushaltsaufgaben teilen',
   'domestic__sharing-a-dwelling-home': 'Zusammen wohnen',
   'domestic__sharing-a-sleeping-space': 'Sich ein Schlafzimmer/Bett teilen',
   'domestic__cooking-together': 'Gemeinsam kochen',
@@ -268,49 +277,49 @@ const ITEM_TRANSLATIONS = {
   'power-exchange-kink__bondage': 'Bondage – Fesselspiele',
   'power-exchange-kink__fetishes': 'Fetische',
   'power-exchange-kink__sadomasochism': 'Sadomasochismus (SM)',
-  'power-exchange-kink__sensation': 'Sensation Play – Reizempfinden gezielt spielerisch einsetzen',
-  'power-exchange-kink__dominance-submission': 'Dominanz & Unterwerfung',
-  'power-exchange-kink__switching': 'Switchen – zwischen dominanter und unterwürfiger Rolle wechseln',
+  'power-exchange-kink__sensation': 'Sensation Play – Reize gezielt und einvernehmlich spielerisch einsetzen',
+  'power-exchange-kink__dominance-submission': 'Dominanz & Unterwerfung – bewusst vereinbarte Machtrollen im Spiel',
+  'power-exchange-kink__switching': 'Switchen – je nach Situation zwischen dominanter und unterwürfiger Rolle wechseln',
 
   // Time Spent Together
   'time-together__holidays': 'Feiertage gemeinsam verbringen',
   'time-together__birthdays': 'Geburtstage gemeinsam verbringen',
   'time-together__anniversaries': 'Jahrestage feiern',
   'time-together__errands': 'Gemeinsam Besorgungen erledigen',
-  'time-together__parallel-play': 'Parallel Play – nebeneinander eigenen Dingen nachgehen',
-  'time-together__frequency': 'Wie oft man sich sieht',
+  'time-together__parallel-play': 'Parallel Play – nebeneinander eigenen Dingen nachgehen, einfach in gemeinsamer Gegenwart',
+  'time-together__frequency': 'Wie oft ihr euch seht',
   'time-together__dates': 'Verabredungen/Dates',
-  'time-together__home': 'Zeit gemeinsam zu Hause',
+  'time-together__home': 'Gemeinsame Zeit zu Hause',
   'time-together__duration': 'Wie lange die gemeinsame Zeit jeweils dauert',
 
   // Co-Caregivers
-  'co-caregivers__family-sick-elderly': 'Familie (krank, pflegebedürftig) – gemeinsame Fürsorge',
-  'co-caregivers__long-term-commitment': 'Langfristige Verbindlichkeit in der Fürsorge',
+  'co-caregivers__family-sick-elderly': 'Familie (krank, pflegebedürftig) – sich gemeinsam um sie kümmern',
+  'co-caregivers__long-term-commitment': 'Langfristige Verbindlichkeit in der gemeinsamen Fürsorge',
   'co-caregivers__animals': 'Haustiere gemeinsam versorgen',
   'co-caregivers__plants': 'Pflanzen gemeinsam versorgen',
-  'co-caregivers__children': 'Kinder gemeinsam versorgen/erziehen',
+  'co-caregivers__children': 'Kinder gemeinsam versorgen und erziehen',
 
   // Caregiving
-  'caregiving__health': 'Gesundheit – sich um die Gesundheit der anderen Person kümmern',
-  'caregiving__sponsorship': 'Unterstützung/Patenschaft – z. B. in Genesungsprozessen',
+  'caregiving__health': 'Sich um die Gesundheit der anderen Person kümmern',
+  'caregiving__sponsorship': 'Unterstützung/Patenschaft – z. B. in Genesungs- oder Wachstumsprozessen',
   'caregiving__reliability': 'Verlässlichkeit in der Pflege',
   'caregiving__emergencies': 'Unterstützung in Notfällen',
-  'caregiving__end-of-life-death': 'Sterbebegleitung / Tod',
-  'caregiving__receiving-giving-care': 'Pflege geben und empfangen',
-  'caregiving__disability': 'Umgang mit Behinderung in der Fürsorge',
+  'caregiving__end-of-life-death': 'Sterbebegleitung / Umgang mit Tod',
+  'caregiving__receiving-giving-care': 'Pflege geben und empfangen können',
+  'caregiving__disability': 'Umgang mit Behinderung in der gegenseitigen Fürsorge',
 
   // Emotional Support
-  'emotional-support__listening': 'Zuhören',
-  'emotional-support__empathy': 'Empathie/Mitgefühl',
-  'emotional-support__insecurities-reassurances': 'Unsicherheiten & gegenseitige Bestärkung',
+  'emotional-support__listening': 'Einander zuhören',
+  'emotional-support__empathy': 'Empathie/Mitgefühl füreinander',
+  'emotional-support__insecurities-reassurances': 'Unsicherheiten teilen und sich gegenseitig bestärken',
   'emotional-support__being-asked-for-advice': 'Um Rat gefragt werden',
-  'emotional-support__confidante': 'Vertraute Person – der man sich anvertraut',
+  'emotional-support__confidante': 'Vertraute Person, der man sich anvertraut',
 
   // Emotional Intimacy
-  'emotional-intimacy__being-vulnerable': 'Verletzlich sein können',
-  'emotional-intimacy__discussing-values-beliefs': 'Über Werte/Überzeugungen sprechen',
-  'emotional-intimacy__difficult-conversations': 'Schwierige Gespräche führen',
-  'emotional-intimacy__love-languages': 'Liebessprachen – wie Zuneigung ausgedrückt/empfangen wird',
+  'emotional-intimacy__being-vulnerable': 'Verletzlich sein können, ohne dafür verurteilt zu werden',
+  'emotional-intimacy__discussing-values-beliefs': 'Über Werte und Überzeugungen offen sprechen',
+  'emotional-intimacy__difficult-conversations': 'Schwierige Gespräche führen können, statt ihnen auszuweichen',
+  'emotional-intimacy__love-languages': 'Liebessprachen – wissen, wie die andere Person Zuneigung am liebsten gibt und empfängt',
 
   // Physical Intimacy
   'physical-intimacy__dance': 'Tanzen',
@@ -322,7 +331,7 @@ const ITEM_TRANSLATIONS = {
   'physical-intimacy__nudity': 'Nacktheit',
   'physical-intimacy__kissing': 'Küssen',
   'physical-intimacy__co-sleeping': 'Zusammen schlafen (im selben Bett)',
-  'physical-intimacy__body-contact': 'Allgemeiner Körperkontakt',
+  'physical-intimacy__body-contact': 'Allgemeiner, nicht-sexueller Körperkontakt',
 
   // Sexual
   'sexual__orgasms': 'Orgasmen',
@@ -331,21 +340,21 @@ const ITEM_TRANSLATIONS = {
   'sexual__touch': 'Berührung',
   'sexual__voice': 'Stimme/verbale Äußerungen beim Sex',
   'sexual__text': 'Sexuell konnotierte Textnachrichten',
-  'sexual__sti-testing-frequency': 'STI-Tests & wie oft getestet wird',
-  'sexual__safer-sex-practices': 'Safer-Sex-Praktiken',
+  'sexual__sti-testing-frequency': 'STI-Tests und wie oft getestet wird',
+  'sexual__safer-sex-practices': 'Safer-Sex-Praktiken, einvernehmlich abgesprochen',
 
   // Romantic
   'romantic__emotional-attraction': 'Emotionale Anziehung',
-  'romantic__cultivating-uniqueness': 'Das Besondere/Einzigartige der Beziehung pflegen',
-  'romantic__unmotivated-euphoria': 'Grundloses Hochgefühl – einfach so Freude aneinander',
+  'romantic__cultivating-uniqueness': 'Das Besondere/Einzigartige dieser einen Beziehung bewusst pflegen',
+  'romantic__unmotivated-euphoria': 'Grundloses Hochgefühl – einfach so Freude und Begeisterung füreinander',
   'romantic__shared-experiences': 'Gemeinsame Erlebnisse',
-  'romantic__intense-focus': 'Intensive Aufmerksamkeit füreinander',
+  'romantic__intense-focus': 'Intensive, hingebungsvolle Aufmerksamkeit füreinander',
   'romantic__crushes': 'Verliebtheitsgefühle/Schwärmerei',
 
   // Creative
   'creative__visual-art': 'Bildende Kunst',
   'creative__craft': 'Handwerk/Basteln',
-  'creative__critique': 'Sich gegenseitig kreatives Feedback geben',
+  'creative__critique': 'Sich gegenseitig ehrliches, konstruktives Feedback zu kreativen Werken geben',
   'creative__music': 'Musik',
   'creative__yoga': 'Yoga',
   'creative__comedy': 'Comedy/Humor',
@@ -356,11 +365,11 @@ const ITEM_TRANSLATIONS = {
   'creative__martial-arts': 'Kampfsport',
 
   // Things to Discuss
-  'things-to-discuss__important-boundaries': 'Wichtige Grenzen',
-  'things-to-discuss__mental-health-trauma': 'Psychische Gesundheit & Trauma',
-  'things-to-discuss__hard-conversations': 'Schwierige Gespräche',
-  'things-to-discuss__security-privacy': 'Sicherheit & Privatsphäre',
-  'things-to-discuss__accountability': 'Verantwortungsübernahme/Rechenschaft',
+  'things-to-discuss__important-boundaries': 'Wichtige Grenzen klar benennen und respektieren',
+  'things-to-discuss__mental-health-trauma': 'Psychische Gesundheit & Trauma offen ansprechen',
+  'things-to-discuss__hard-conversations': 'Schwierige Gespräche nicht aufschieben, sondern aktiv führen',
+  'things-to-discuss__security-privacy': 'Sicherheit & Privatsphäre gemeinsam aushandeln',
+  'things-to-discuss__accountability': 'Verantwortung übernehmen und sich bei Bedarf gegenseitig Rechenschaft geben',
 };
 
 // Attach the full German translation/explanation as each item's German

@@ -664,8 +664,15 @@ main {
 }
 
 #panel-title {
-  margin: 0 2rem 1rem 0;
+  margin: 0 2rem 0.25rem 0;
   font-size: 1.15rem;
+}
+
+.panel-framing {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-muted);
 }
 
 .panel-backdrop {

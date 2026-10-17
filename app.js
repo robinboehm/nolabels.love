@@ -166,6 +166,16 @@ const STRINGS = {
     en: 'Content is based on the <strong>Relationship Anarchy Smörgåsbord (v6)</strong> by Lyrica Lawrence &amp; Heather Orr, updated by Maxx Hill — licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>. This app stores all data exclusively locally in your browser (localStorage) — nothing is sent to a server.',
   },
 
+  footerManifesto: {
+    de: 'Die Formulierungen der Items orientieren sich an der Leitfrage „Unsere Beziehung beinhaltet …“ und sind inspiriert vom <a href="https://log.andie.se/post/26652940513/the-short-instructional-manifesto-for-relationship" target="_blank" rel="noopener">Manifest für Beziehungsanarchie</a> von Andie Nordgren (2006).',
+    en: 'Item wording follows the guiding question "Our relationship includes …" and is informed by Andie Nordgren\'s <a href="https://log.andie.se/post/26652940513/the-short-instructional-manifesto-for-relationship" target="_blank" rel="noopener">short instructional manifesto for relationship anarchy</a> (2006).',
+  },
+
+  // Shown once per category panel, right under the category title, so the
+  // list of items below it reads as answers to one running question — the
+  // same framing the original Smörgåsbord card deck uses.
+  panelFraming: { de: 'Unsere Beziehung beinhaltet …', en: 'Our relationship includes …' },
+
   bubbleAriaLabel: {
     de: '{title}: {fulfilled} von {total} erfüllt, {partial} teilweise, {unanswered} unbeantwortet',
     en: '{title}: {fulfilled} of {total} fulfilled, {partial} partial, {unanswered} unanswered',
@@ -890,6 +900,7 @@ function openCategoryPanel(categoryId) {
   const person = getSelectedPerson();
 
   document.getElementById('panel-title').textContent = categoryTitle(category);
+  document.getElementById('panel-framing').textContent = t('panelFraming');
   const itemsEl = document.getElementById('panel-items');
   itemsEl.innerHTML = '';
 

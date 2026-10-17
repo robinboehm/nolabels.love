@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Relationship Anarchy Smörgåsbord — Board</title>
-<link rel="stylesheet" href="style.css?v=11" />
+<link rel="stylesheet" href="style.css?v=12" />
 </head>
 <body>
 
@@ -120,6 +120,7 @@
 <aside class="panel" id="panel" aria-hidden="true">
   <button class="panel-close" id="panel-close" data-i18n-aria-label="panelCloseAriaLabel" aria-label="Schließen">✕</button>
   <h2 id="panel-title"></h2>
+  <p class="panel-framing" id="panel-framing"></p>
   <div id="panel-items"></div>
 </aside>
 
@@ -132,11 +133,17 @@
     Diese App speichert alle Daten ausschließlich lokal in deinem Browser
     (localStorage) — nichts wird an einen Server gesendet.
   </p>
+  <p data-i18n-html="footerManifesto">
+    Die Formulierungen der Items orientieren sich an der Leitfrage
+    „Unsere Beziehung beinhaltet …“ und sind inspiriert vom
+    <a href="https://log.andie.se/post/26652940513/the-short-instructional-manifesto-for-relationship" target="_blank" rel="noopener">Manifest für Beziehungsanarchie</a>
+    von Andie Nordgren (2006).
+  </p>
   <p class="app-version" id="app-version"></p>
 </footer>
 
-<script src="version.js?v=11"></script>
-<script src="data.js?v=11"></script>
-<script src="app.js?v=11"></script>
+<script src="version.js?v=12"></script>
+<script src="data.js?v=12"></script>
+<script src="app.js?v=12"></script>
 </body>
 </html>
