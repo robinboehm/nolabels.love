@@ -61,6 +61,23 @@ Da alles nur lokal liegt: unterschiedliche Browser oder das Löschen der
 Browserdaten führen zu getrennten/verlorenen Ständen. Regelmäßig exportieren,
 wenn dir die Daten wichtig sind.
 
+### Teilen per QR-Code
+
+Über **📱 QR-Code** neben "Person teilen" lässt sich eine Person direkt von
+Handy zu Handy übertragen, ganz ohne Server oder gemeinsames Netzwerk: Die
+Daten (Status & Wunsch pro Punkt, keine Notizen) werden kompakt codiert und
+komplett im Link selbst untergebracht, der wiederum als QR-Code angezeigt
+wird — `https://…/index.html#p=…`. Der Teil nach `#` wird von Browsern nie
+mit an den Server geschickt, auch nicht an GitHub Pages; es fließen also
+zu keinem Zeitpunkt Daten über ein Netzwerk.
+
+Einfach mit der normalen Handykamera scannen (kein Login, keine zusätzliche
+App nötig) — das öffnet den Link, die App erkennt die Daten automatisch und
+fragt, ob die Person als neue hinzugefügt werden soll. Notizen werden
+bewusst nicht mit übertragen, da freier Text den Code unnötig groß und
+schwerer scannbar machen würde; dafür bleibt der Datei-basierte
+Export/Import oben die passende Wahl.
+
 ### Versionierung der Daten
 
 Jede Person bekommt beim Anlegen ein `dataVersion`-Feld (App-Version, mit der
@@ -92,6 +109,7 @@ node scripts/update-version.js
 | `app.js` | State-Management, Rendering, localStorage, Export/Import |
 | `version.js` | Auto-generiert: `APP_VERSION` aus Commit-Anzahl + Hash |
 | `scripts/update-version.js` | Erzeugt `version.js` & bumpt `?v=`-Cache-Busting |
+| `vendor/qrcode-generator.js` | Gevendorte QR-Code-Bibliothek (MIT, kazuhikoarase), für den QR-Export |
 
 ## Layout-Hinweis
 

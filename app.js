@@ -290,6 +290,36 @@ const STRINGS = {
     en: 'There are no open questions left for {name} right now.',
   },
   wizardDoneClose: { de: 'Schließen', en: 'Close' },
+
+  // ---------- QR share ----------
+  // Shares a single person as a QR code whose payload IS the entire URL +
+  // data (status & desire only, no notes) — nothing ever touches a server,
+  // since URL fragments (the part after "#") are never sent in HTTP
+  // requests, not even to GitHub Pages itself.
+  btnQrShareLabel: { de: '📱 QR-Code', en: '📱 QR code' },
+  btnQrShareTitle: {
+    de: 'Diese Person als QR-Code anzeigen (ohne Notizen) — die Partnerin/der Partner scannt ihn einfach mit der Handykamera',
+    en: 'Show this person as a QR code (no notes) — your partner just scans it with their phone camera',
+  },
+  qrCloseAriaLabel: { de: 'Schließen', en: 'Close' },
+  qrModalTitle: { de: 'QR-Code', en: 'QR code' },
+  qrHint: {
+    de: 'Lass deine Partnerin/deinen Partner diesen Code mit der Handykamera scannen — der Link öffnet diese App und bietet den Import an. Enthält nur Status & Wunsch, keine Notizen.',
+    en: 'Have your partner scan this with their phone camera — the link opens this app and offers to import it. Contains only status & desire, no notes.',
+  },
+  qrImportTitle: { de: 'Per QR-Code geteilte Person importieren?', en: 'Import person shared via QR code?' },
+  qrImportSummary: {
+    de: '<strong>{name}</strong> ({rated}/{total} Punkte bewertet{doneSuffix}) als neue Person hinzufügen?',
+    en: 'Add <strong>{name}</strong> ({rated}/{total} items rated{doneSuffix}) as a new person?',
+  },
+  qrImportDoneSuffix: { de: ', als fertig markiert', en: ', marked as done' },
+  qrImportCancel: { de: 'Abbrechen', en: 'Cancel' },
+  qrImportConfirm: { de: 'Importieren', en: 'Import' },
+  alertQrImportSuccess: { de: '"{name}" wurde importiert.', en: '"{name}" was imported.' },
+  alertQrImportFailure: {
+    de: 'Dieser QR-Code/Link konnte nicht gelesen werden (beschädigt oder aus einer inkompatiblen App-Version).',
+    en: 'This QR code/link could not be read (damaged, or from an incompatible app version).',
+  },
 };
 
 /** Looks up a STRINGS entry for the current language, with {placeholder} interpolation. */
@@ -1420,6 +1450,171 @@ function importPersonFile(file) {
 }
 
 // ---------------------------------------------------------------------
+// QR share: ultra-compact encoding of one person's status+desire, carried
+// entirely inside a URL fragment (the "#..." part) so it never touches a
+// server — not even GitHub Pages, which never even sees it. Notes are
+// deliberately excluded (free text could make the code unreliably large);
+// the file-based "Person teilen"/"Person importieren" above still covers
+// those.
+// ---------------------------------------------------------------------
+
+// Bump this if the *encoding itself* ever changes shape — lets
+// decodePersonFromQr() reject codes it can't safely interpret instead of
+// silently producing garbage data.
+const QR_SCHEMA_VERSION = '1';
+
+// 5 statuses × 3 desires = 15 combinations, each item reduced to a single
+// character. Item identity comes purely from position in getAllItems()
+// (the fixed RA_CATEGORIES order) rather than storing ids — that's what
+// keeps the whole 179-item board down to ~200 characters.
+const QR_STATE_ALPHABET = '0123456789abcde';
+const QR_STATUS_ORDER = [STATUS.UNANSWERED, STATUS.UNFULFILLED, STATUS.PARTIAL_NO, STATUS.PARTIAL_YES, STATUS.FULFILLED];
+const QR_DESIRE_ORDER = [DESIRE.UNANSWERED, DESIRE.UNWANTED, DESIRE.WANTED];
+
+function encodeItemStateChar(entry) {
+  const si = Math.max(0, QR_STATUS_ORDER.indexOf(entry.status));
+  const di = Math.max(0, QR_DESIRE_ORDER.indexOf(entry.desire));
+  return QR_STATE_ALPHABET[si * QR_DESIRE_ORDER.length + di];
+}
+
+function decodeItemStateChar(char) {
+  const index = QR_STATE_ALPHABET.indexOf(char);
+  if (index === -1) return { status: DEFAULT_STATUS, desire: DEFAULT_DESIRE };
+  return {
+    status: QR_STATUS_ORDER[Math.floor(index / QR_DESIRE_ORDER.length)],
+    desire: QR_DESIRE_ORDER[index % QR_DESIRE_ORDER.length],
+  };
+}
+
+// Fields are joined with "," — safe as a delimiter because
+// encodeURIComponent() always escapes a literal comma (to %2C), so it can
+// never appear *inside* the encoded name and be mistaken for a separator.
+function encodePersonForQr(person) {
+  const stateString = getAllItems()
+    .map((item) => encodeItemStateChar(getItemEntry(person, item.id)))
+    .join('');
+  return [QR_SCHEMA_VERSION, person.done ? '1' : '0', encodeURIComponent(person.name), stateString].join(',');
+}
+
+function decodePersonFromQr(payload) {
+  const parts = payload.split(',');
+  if (parts.length !== 4) throw new Error('Invalid QR payload shape');
+  const [schemaVersion, doneFlag, encodedName, stateString] = parts;
+  if (schemaVersion !== QR_SCHEMA_VERSION) throw new Error('Unknown QR schema version');
+  const items = getAllItems();
+  if (stateString.length !== items.length) throw new Error('Item count mismatch (incompatible app version?)');
+  const name = decodeURIComponent(encodedName);
+  if (!name) throw new Error('Missing name');
+  const personItems = {};
+  items.forEach((item, i) => {
+    personItems[item.id] = { ...decodeItemStateChar(stateString[i]), note: '' };
+  });
+  return {
+    id: uid(),
+    name,
+    items: personItems,
+    done: doneFlag === '1',
+    // Distinguishable from both a real APP_VERSION and 'pre-versioning' —
+    // this person's data didn't travel through the normal export/import
+    // path, so there's no meaningful "created with version X" to record.
+    dataVersion: 'qr-import',
+  };
+}
+
+function buildQrShareUrl(person) {
+  const base = location.origin + location.pathname;
+  return `${base}#p=${encodePersonForQr(person)}`;
+}
+
+function openQrShareModal() {
+  const person = getSelectedPerson();
+  const url = buildQrShareUrl(person);
+  document.getElementById('qr-person-name').textContent = person.name;
+  const box = document.getElementById('qr-code-box');
+  box.innerHTML = '';
+  // typeNumber 0 = auto-pick the smallest QR version that fits; 'H' = high
+  // error correction, affordable here since the payload is tiny and it
+  // makes scanning far more forgiving of glare/scratched phone screens.
+  const qr = qrcode(0, 'H');
+  qr.addData(url);
+  qr.make();
+  box.innerHTML = qr.createSvgTag({ scalable: true, margin: 2 });
+  const overlay = document.getElementById('qr-overlay');
+  overlay.classList.remove('hidden');
+  overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeQrShareModal() {
+  const overlay = document.getElementById('qr-overlay');
+  if (overlay.contains(document.activeElement)) document.getElementById('btn-qr-share').focus();
+  overlay.classList.add('hidden');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+// Holds the decoded-but-not-yet-confirmed person while the import
+// confirmation dialog is open.
+let pendingQrImportPerson = null;
+
+function openQrImportConfirm(person) {
+  pendingQrImportPerson = person;
+  const alignStats = computeAlignmentStats(person, getAllItems());
+  document.getElementById('qr-import-summary').innerHTML = t('qrImportSummary', {
+    name: escapeHtml(person.name),
+    rated: alignStats.rated,
+    total: alignStats.total,
+    doneSuffix: person.done ? t('qrImportDoneSuffix') : '',
+  });
+  const overlay = document.getElementById('qr-import-overlay');
+  overlay.classList.remove('hidden');
+  overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeQrImportConfirm() {
+  pendingQrImportPerson = null;
+  const overlay = document.getElementById('qr-import-overlay');
+  // No fixed "opener" button here (this overlay is triggered by a URL, not
+  // a click) — move focus to <body> before hiding, so a focused descendant
+  // never ends up stuck inside an aria-hidden container.
+  if (overlay.contains(document.activeElement)) document.activeElement.blur();
+  overlay.classList.add('hidden');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+function confirmQrImport() {
+  if (!pendingQrImportPerson) return;
+  const person = pendingQrImportPerson;
+  state.people.push(person);
+  state.selectedPersonId = person.id;
+  saveState();
+  closeQrImportConfirm();
+  renderApp();
+  alert(t('alertQrImportSuccess', { name: person.name }));
+}
+
+// Checks the current URL for a "#p=..." fragment left by a scanned QR
+// code (or a tapped share link) and, if found, offers to import it. The
+// fragment is stripped via history.replaceState() right away regardless of
+// outcome, so refreshing or navigating back never re-triggers the prompt.
+function checkUrlForQrImport() {
+  const hash = location.hash;
+  if (!hash.startsWith('#p=')) return;
+  // Note: only the name sub-field was ever encodeURIComponent'd (inside
+  // encodePersonForQr/decodePersonFromQr) — the payload as a whole is left
+  // as-is, so no extra decode step belongs here. Decoding the whole thing
+  // again would corrupt the comma-delimited split if the name contains
+  // escaped characters.
+  const payload = hash.slice(3);
+  history.replaceState(null, '', location.pathname + location.search);
+  try {
+    const person = decodePersonFromQr(payload);
+    openQrImportConfirm(person);
+  } catch (err) {
+    console.error(err);
+    alert(t('alertQrImportFailure'));
+  }
+}
+
+// ---------------------------------------------------------------------
 // Wire up static event listeners (once)
 // ---------------------------------------------------------------------
 
@@ -1485,11 +1680,34 @@ function initEventListeners() {
     if (e.target.id === 'wizard-overlay') closeWizard();
   });
 
+  document.getElementById('btn-qr-share').addEventListener('click', openQrShareModal);
+  document.getElementById('qr-close').addEventListener('click', closeQrShareModal);
+  document.getElementById('qr-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'qr-overlay') closeQrShareModal();
+  });
+
+  document.getElementById('qr-import-close').addEventListener('click', closeQrImportConfirm);
+  document.getElementById('qr-import-cancel').addEventListener('click', closeQrImportConfirm);
+  document.getElementById('qr-import-confirm').addEventListener('click', confirmQrImport);
+  document.getElementById('qr-import-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'qr-import-overlay') closeQrImportConfirm();
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const wizardOverlay = document.getElementById('wizard-overlay');
     if (wizardOverlay && !wizardOverlay.classList.contains('hidden')) {
       closeWizard();
+      return;
+    }
+    const qrOverlay = document.getElementById('qr-overlay');
+    if (qrOverlay && !qrOverlay.classList.contains('hidden')) {
+      closeQrShareModal();
+      return;
+    }
+    const qrImportOverlay = document.getElementById('qr-import-overlay');
+    if (qrImportOverlay && !qrImportOverlay.classList.contains('hidden')) {
+      closeQrImportConfirm();
       return;
     }
     closeCategoryPanel();
@@ -1516,4 +1734,5 @@ document.addEventListener('DOMContentLoaded', () => {
   applyStaticTranslations();
   initEventListeners();
   renderApp();
+  checkUrlForQrImport();
 });

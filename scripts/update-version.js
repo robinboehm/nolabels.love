@@ -43,7 +43,11 @@ fs.writeFileSync(versionFile, versionContent);
 
 const indexFile = path.join(__dirname, '..', 'index.html');
 let html = fs.readFileSync(indexFile, 'utf8');
-html = html.replace(/((?:version|data|app|style)\.(?:js|css))\?v=[^"']*/g, (_match, filename) => `${filename}?v=${count}`);
+// Matches any local asset reference already using the `?v=` cache-busting
+// convention (e.g. "style.css?v=16", "vendor/qrcode-generator.js?v=16"),
+// regardless of path/filename, so newly added assets just need the `?v=`
+// suffix added once by hand and are then kept in sync automatically.
+html = html.replace(/([\w./-]+\.(?:js|css))\?v=[^"']*/g, (_match, filename) => `${filename}?v=${count}`);
 fs.writeFileSync(indexFile, html);
 
 console.log(`version.js + index.html cache-busting params updated → ${version} (v=${count})`);

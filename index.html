@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Relationship Anarchy Smörgåsbord — Board</title>
-<link rel="stylesheet" href="style.css?v=16" />
+<link rel="stylesheet" href="style.css?v=17" />
 </head>
 <body>
 
@@ -23,6 +23,7 @@
 
     <div class="data-controls">
       <button id="btn-export-person" class="btn" data-i18n="btnExportPersonLabel" data-i18n-title="btnExportPersonTitle" title="Nur die aktuell ausgewählte Person als Datei exportieren, zum Teilen mit der Partnerin/dem Partner">Person teilen</button>
+      <button id="btn-qr-share" class="btn" data-i18n="btnQrShareLabel" data-i18n-title="btnQrShareTitle" title="Diese Person als QR-Code anzeigen (ohne Notizen) — die Partnerin/der Partner scannt ihn einfach mit der Handykamera">📱 QR-Code</button>
       <button id="btn-import-person" class="btn" data-i18n="btnImportPersonLabel" data-i18n-title="btnImportPersonTitle" title="Eine geteilte Person-Datei importieren, ohne die anderen Personen zu überschreiben">Person importieren</button>
       <input type="file" id="file-import-person" accept="application/json" class="sr-only" />
       <button id="btn-export" class="btn" data-i18n="btnExportLabel" data-i18n-title="btnExportTitle" title="Alle Personen als vollständiges Backup exportieren">Alles exportieren</button>
@@ -124,6 +125,30 @@
   <div id="panel-items"></div>
 </aside>
 
+<div class="qr-overlay hidden" id="qr-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="qr-title">
+  <div class="qr-card">
+    <button type="button" class="panel-close" id="qr-close" data-i18n-aria-label="qrCloseAriaLabel" aria-label="Schließen">✕</button>
+    <h2 id="qr-title" data-i18n="qrModalTitle">QR-Code</h2>
+    <p class="qr-person-name" id="qr-person-name"></p>
+    <div class="qr-code-box" id="qr-code-box"></div>
+    <p class="qr-hint" data-i18n="qrHint">
+      Lass deine Partnerin/deinen Partner diesen Code mit der Handykamera scannen — der Link öffnet diese App und bietet den Import an. Enthält nur Status & Wunsch, keine Notizen.
+    </p>
+  </div>
+</div>
+
+<div class="qr-overlay hidden" id="qr-import-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="qr-import-title">
+  <div class="qr-card">
+    <button type="button" class="panel-close" id="qr-import-close" data-i18n-aria-label="qrCloseAriaLabel" aria-label="Schließen">✕</button>
+    <h2 id="qr-import-title" data-i18n="qrImportTitle">Per QR-Code geteilte Person importieren?</h2>
+    <p id="qr-import-summary" class="qr-import-summary"></p>
+    <div class="qr-import-actions">
+      <button type="button" class="btn" id="qr-import-cancel" data-i18n="qrImportCancel">Abbrechen</button>
+      <button type="button" class="btn btn-primary" id="qr-import-confirm" data-i18n="qrImportConfirm">Importieren</button>
+    </div>
+  </div>
+</div>
+
 <button type="button" class="wizard-fab" id="btn-start-wizard" data-i18n-aria-label="wizardFabAriaLabel" aria-label="Wizard starten: offene Fragen nacheinander beantworten">
   <span class="wizard-fab-icon" aria-hidden="true">🧭</span>
   <span class="wizard-fab-label" data-i18n="wizardFabLabel">Wizard</span>
@@ -164,8 +189,9 @@
   <p class="app-version" id="app-version"></p>
 </footer>
 
-<script src="version.js?v=16"></script>
-<script src="data.js?v=16"></script>
-<script src="app.js?v=16"></script>
+<script src="version.js?v=17"></script>
+<script src="data.js?v=17"></script>
+<script src="vendor/qrcode-generator.js?v=17"></script>
+<script src="app.js?v=17"></script>
 </body>
 </html>
