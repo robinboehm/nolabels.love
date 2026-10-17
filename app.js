@@ -176,6 +176,15 @@ const STRINGS = {
   // same framing the original Smörgåsbord card deck uses.
   panelFraming: { de: 'Unsere Beziehung beinhaltet …', en: 'Our relationship includes …' },
 
+  // Label for the <summary> that reveals itemSecondary() content. Collapsed
+  // by default so items don't show both languages at once — the German UI
+  // shows the original English term, the English UI shows the German
+  // translation/explanation, only once someone asks to see it.
+  itemSecondaryToggle: {
+    de: 'Originalbegriff (Englisch) anzeigen',
+    en: 'Show German translation',
+  },
+
   bubbleAriaLabel: {
     de: '{title}: {fulfilled} von {total} erfüllt, {partial} teilweise, {unanswered} unbeantwortet',
     en: '{title}: {fulfilled} of {total} fulfilled, {partial} partial, {unanswered} unanswered',
@@ -799,7 +808,12 @@ function discussRowHtml({ item, entryA, entryB, desireDiff, statusDiff }, person
         <span class="item-label">${escapeHtml(itemLabel(item))}</span>
         <span class="discuss-tag">${tag}</span>
       </div>
-      ${secondary ? `<div class="item-translation">${escapeHtml(secondary)}</div>` : ''}
+      ${secondary ? `
+        <details class="item-explain">
+          <summary>${escapeHtml(t('itemSecondaryToggle'))}</summary>
+          <div class="item-translation">${escapeHtml(secondary)}</div>
+        </details>
+      ` : ''}
       <div class="discuss-compare">
         <div class="discuss-side">
           <div class="discuss-side-name">${escapeHtml(personA.name)}</div>
@@ -915,7 +929,12 @@ function openCategoryPanel(categoryId) {
         <span class="item-label">${escapeHtml(label)}</span>
         <span class="match-indicator" aria-hidden="true"></span>
       </div>
-      ${secondary ? `<div class="item-translation">${escapeHtml(secondary)}</div>` : ''}
+      ${secondary ? `
+        <details class="item-explain">
+          <summary>${escapeHtml(t('itemSecondaryToggle'))}</summary>
+          <div class="item-translation">${escapeHtml(secondary)}</div>
+        </details>
+      ` : ''}
       <div class="item-row-control">
         <span class="control-label">${t('controlLabelStatus')}</span>
         <div class="status-group" role="group" aria-label="${escapeHtml(t('statusGroupAriaLabel', { label }))}">

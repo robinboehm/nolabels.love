@@ -719,11 +719,37 @@ main {
 .match-indicator--match { color: var(--color-match); }
 .match-indicator--mismatch { color: var(--color-mismatch); }
 
+.item-explain {
+  margin: -0.1rem 0 0.5rem;
+}
+
+.item-explain summary {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.item-explain summary::-webkit-details-marker { display: none; }
+
+.item-explain summary::before {
+  content: '▸';
+  font-size: 0.6rem;
+  transition: transform 0.15s ease;
+}
+
+.item-explain[open] summary::before { transform: rotate(90deg); }
+
+.item-explain summary:hover { color: inherit; text-decoration: underline; }
+
 .item-translation {
   font-size: 0.74rem;
   color: var(--color-muted);
   line-height: 1.35;
-  margin: -0.1rem 0 0.5rem;
+  margin: 0.35rem 0 0;
 }
 
 .item-row-control {
